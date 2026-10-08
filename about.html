@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEONEXUS | About the Nexus</title>
+    <link rel="stylesheet" href="Styles.css">
+</head>
+<body>
+
+    <header>
+        <h1>GEONEXUS</h1>
+        <p>VISION INTO IMMERSIVE REALITY</p>
+        
+    </header>
+
+    <nav>
+        <a href="Homepage.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="blog.html">Blog</a>
+        <a href="Map.html">Map</a>
+    </nav>
+
+    <main class="hero-split">
+        <section class="content-left">
+            <h2>Project Origins</h2>
+            <p>GEONEXUS was established in 2026 to bridge the gap between physical topography and digital consciousness. Our mission is to seamlessly map the physical world into an immersive, interactive reality framework.</p>
+            
+            <hr>
+
+            <h2>Meet the Team</h2>
+            <div class="team-grid">
+                <!-- Member 1 -->
+                <article class="team-card">
+                    <h3>Matimu Mbambo</h3>
+                    <div class="team-image"><img src="cv_pic.jpeg" alt="Matimu Mbambo"></div>
+                    
+                    <p>Geoinformatics & System Design</p>
+                </article>
+
+                <!-- Member 2 -->
+                <article class="team-card">
+                    <h3>Ofentse Lekhuleni</h3>
+                    <div class="team-image"><img src="OL.png" alt="Ofentse Lekhuleni"></div>
+                    
+                    <p>Spatial Modelling</p>
+                </article>
+
+                <!-- Member 3 -->
+                <article class="team-card">
+                    <h3>Tanatswa Makombe</h3>
+                    <div class="team-image"><img src="TM.jpeg" alt="Tanatswa Makombe"></div>
+                    
+                    <p>Web Architecture</p>
+                </article>
+            </div>
+
+        </section>
+
+        <section class="visual-right">
+
+            <div class="globe-container">
+
+                <canvas id="globeCanvas"></canvas>
+
+                <div class="globe-overlay">
+                    <span>GX-07</span>
+                    <span>GLOBAL NETWORK</span>
+                </div>
+
+                <div class="globe-status">
+                    <span class="status-dot"></span>
+                    PLANETARY DATA LINK
+                </div>
+
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 GEONEXUS Systems. All rights reserved.</p>
+        <p class="footer-code">[ TRANSMISSION END // AWAITING NEXT SEQUENCE_ ]</p>
+    </footer>
+
+<script type="module">
+
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+
+
+// GEONEXUS 3D EARTH
+
+const canvas = document.getElementById("globeCanvas");
+
+
+
+// SCENE
+
+const scene = new THREE.Scene();
+
+
+
+// CAMERA
+
+const camera = new THREE.PerspectiveCamera(
+    35,
+    canvas.clientWidth / canvas.clientHeight,
+    0.1,
+    1000
+);
+
+camera.position.z = 3.2;
+
+
+
+// RENDERER
+
+const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    alpha: true,
+    antialias: true
+});
+
+renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio, 2)
+);
+
+renderer.setSize(
+    canvas.clientWidth,
+    canvas.clientHeight,
+    false
+);
+
+
+
+// EARTH GROUP
+
+const earthGroup = new THREE.Group();
+
+scene.add(earthGroup);
+
+
+
+// EARTH SPHERE
+
+const earthGeometry =
+    new THREE.SphereGeometry(
+        1,
+        96,
+        96
+    );
+
+const earthMaterial =
+    new THREE.MeshPhongMaterial({
+
+        color: 0x07151c,
+
+        emissive: 0x062b2b,
+
+        emissiveIntensity: 0.45,
+
+        shininess: 100,
+
+        specular: 0x000000
+
+    });
+
+const earth =
+    new THREE.Mesh(
+        earthGeometry,
+        earthMaterial
+    );
+
+earthGroup.add(earth);
+
+
+
+// ATMOSPHERE
+
+const atmosphereGeometry =
+    new THREE.SphereGeometry(
+        1.08,
+        96,
+        96
+    );
+
+const atmosphereMaterial =
+    new THREE.MeshBasicMaterial({
+
+        color: 0x48e5c2,
+
+        transparent: true,
+
+        opacity: 0.10,
+
+        side: THREE.BackSide
+
+    });
+
+const atmosphere =
+    new THREE.Mesh(
+        atmosphereGeometry,
+        atmosphereMaterial
+    );
+
+earthGroup.add(atmosphere);
+
+
+
+// LATITUDE / LONGITUDE GRID
+
+const gridMaterial =
+    new THREE.LineBasicMaterial({
+
+        color: 0x23b5a4,
+
+        transparent: true,
+
+        opacity: 0.20
+
+    });
+
+
+
+// LATITUDE
+
+for (
+    let latitude = -80;
+    latitude <= 80;
+    latitude += 10
+) {
+
+    const radius =
+        Math.cos(
+            THREE.MathUtils.degToRad(latitude)
+        );
+
+    const y =
+        Math.sin(
+            THREE.MathUtils.degToRad(latitude)
+        );
+
+    const points = [];
+
+    for (
+        let i = 0;
+        i <= 128;
+        i++
+    ) {
+
+        const angle =
+            (i / 128) *
+            Math.PI *
+            2;
+
+        points.push(
+
+            new THREE.Vector3(
+
+                radius *
+                Math.cos(angle),
+
+                y,
+
+                radius *
+                Math.sin(angle)
+
+            )
+
+        );
+
+    }
+
+    const geometry =
+        new THREE.BufferGeometry()
+        .setFromPoints(points);
+
+    const line =
+        new THREE.Line(
+            geometry,
+            gridMaterial
+        );
+
+    earthGroup.add(line);
+
+}
+
+
+
+// LONGITUDE
+
+for (
+    let longitude = 0;
+    longitude < 360;
+    longitude += 10
+) {
+
+    const points = [];
+
+    for (
+        let i = 0;
+        i <= 128;
+        i++
+    ) {
+
+        const latitude =
+            -Math.PI / 2 +
+            (i / 128) * Math.PI;
+
+        const lon =
+            THREE.MathUtils.degToRad(
+                longitude
+            );
+
+        points.push(
+
+            new THREE.Vector3(
+
+                Math.cos(latitude) *
+                Math.cos(lon),
+
+                Math.sin(latitude),
+
+                Math.cos(latitude) *
+                Math.sin(lon)
+
+            )
+
+        );
+
+    }
+
+    const geometry =
+        new THREE.BufferGeometry()
+        .setFromPoints(points);
+
+    const line =
+        new THREE.Line(
+            geometry,
+            gridMaterial
+        );
+
+    earthGroup.add(line);
+
+}
+
+
+
+// GEOJSON COUNTRY BORDERS
+
+const borderGroup =
+    new THREE.Group();
+
+earthGroup.add(borderGroup);
+
+
+
+// CONVERT LAT/LON TO 3D POSITION
+
+function latLonToVector3(
+    latitude,
+    longitude,
+    radius = 1.012
+) {
+
+    const phi =
+        (90 - latitude) *
+        Math.PI / 180;
+
+    const theta =
+        (longitude + 180) *
+        Math.PI / 180;
+
+
+    return new THREE.Vector3(
+
+        -radius *
+        Math.sin(phi) *
+        Math.cos(theta),
+
+        radius *
+        Math.cos(phi),
+
+        radius *
+        Math.sin(phi) *
+        Math.sin(theta)
+
+    );
+
+}
+
+
+
+// DRAW COUNTRY BORDER
+
+function drawPolygon(
+    coordinates
+) {
+
+    const points = [];
+
+    for (
+        const coordinate of coordinates
+    ) {
+
+        const longitude =
+            coordinate[0];
+
+        const latitude =
+            coordinate[1];
+
+        points.push(
+
+            latLonToVector3(
+                latitude,
+                longitude,
+                1.015
+            )
+
+        );
+
+    }
+
+
+    if (points.length < 2) {
+        return;
+    }
+
+
+    const geometry =
+        new THREE.BufferGeometry()
+        .setFromPoints(points);
+
+
+    const material =
+        new THREE.LineBasicMaterial({
+
+            color: 0x48e5c2,
+
+            transparent: true,
+
+            opacity: 0.75
+
+        });
+
+
+    const line =
+        new THREE.Line(
+            geometry,
+            material
+        );
+
+
+    borderGroup.add(line);
+
+}
+
+
+
+// PROCESS GEOJSON GEOMETRY
+
+function processGeometry(
+    geometry
+) {
+
+    if (!geometry) {
+        return;
+    }
+
+
+
+    // POLYGON
+
+    if (
+        geometry.type === "Polygon"
+    ) {
+
+        geometry.coordinates.forEach(
+            polygon => {
+
+                drawPolygon(polygon);
+
+            }
+        );
+
+    }
+
+
+   
+    // MULTI POLYGON
+
+    else if (
+        geometry.type === "MultiPolygon"
+    ) {
+
+        geometry.coordinates.forEach(
+            multiPolygon => {
+
+                multiPolygon.forEach(
+                    polygon => {
+
+                        drawPolygon(polygon);
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+}
+
+
+
+// LOAD WORLD COUNTRY DATA
+
+fetch(
+    "https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson"
+)
+
+.then(response => {
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Could not load world map data."
+        );
+
+    }
+
+    return response.json();
+
+})
+
+.then(data => {
+
+    console.log(
+        "GEONEXUS: World map loaded."
+    );
+
+
+    data.features.forEach(
+        feature => {
+
+            processGeometry(
+                feature.geometry
+            );
+
+        }
+    );
+
+})
+
+.catch(error => {
+
+    console.error(
+        "GEONEXUS map error:",
+        error
+    );
+
+});
+
+
+
+// LIGHTING
+
+const ambientLight =
+    new THREE.AmbientLight(
+        0x48e5c2,
+        1.4
+    );
+
+scene.add(ambientLight);
+
+
+const directionalLight =
+    new THREE.DirectionalLight(
+        0xffffff,
+        2.2
+    );
+
+directionalLight.position.set(
+    5,
+    3,
+    5
+);
+
+scene.add(
+    directionalLight
+);
+
+
+
+// OUTER ORBIT RINGS
+
+function createOrbitRing(
+    radius,
+    rotationX,
+    rotationY
+) {
+
+    const geometry =
+        new THREE.RingGeometry(
+            radius,
+            radius + 0.002,
+            128
+        );
+
+    const material =
+        new THREE.MeshBasicMaterial({
+
+            color: 0x48e5c2,
+
+            transparent: true,
+
+            opacity: 0.25,
+
+            side: THREE.DoubleSide
+
+        });
+
+
+    const ring =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+
+    ring.rotation.x =
+        rotationX;
+
+    ring.rotation.y =
+        rotationY;
+
+
+    scene.add(ring);
+
+    return ring;
+
+}
+
+
+const orbit1 =
+    createOrbitRing(
+        1.28,
+        Math.PI / 2.5,
+        0
+    );
+
+
+const orbit2 =
+    createOrbitRing(
+        1.35,
+        Math.PI / 3,
+        Math.PI / 5
+    );
+
+
+
+// STAR PARTICLES
+
+const starGeometry =
+    new THREE.BufferGeometry();
+
+const starPositions = [];
+
+for (
+    let i = 0;
+    i < 700;
+    i++
+) {
+
+    const radius =
+        3 +
+        Math.random() * 3;
+
+    const theta =
+        Math.random() *
+        Math.PI *
+        2;
+
+    const phi =
+        Math.acos(
+            2 * Math.random() - 1
+        );
+
+
+    starPositions.push(
+
+        radius *
+        Math.sin(phi) *
+        Math.cos(theta),
+
+        radius *
+        Math.sin(phi) *
+        Math.sin(theta),
+
+        radius *
+        Math.cos(phi)
+
+    );
+
+}
+
+
+starGeometry.setAttribute(
+
+    "position",
+
+    new THREE.Float32BufferAttribute(
+        starPositions,
+        3
+    )
+
+);
+
+
+const starMaterial =
+    new THREE.PointsMaterial({
+
+        color: 0x48e5c2,
+
+        size: 0.012,
+
+        transparent: true,
+
+        opacity: 0.55
+
+    });
+
+
+const stars =
+    new THREE.Points(
+        starGeometry,
+        starMaterial
+    );
+
+
+scene.add(stars);
+
+
+
+// MOUSE ROTATION
+
+let mouseDown = false;
+
+let previousMouseX = 0;
+
+let previousMouseY = 0;
+
+let rotationVelocity = 0.0025;
+
+
+canvas.addEventListener(
+    "pointerdown",
+    event => {
+
+        mouseDown = true;
+
+        previousMouseX =
+            event.clientX;
+
+        previousMouseY =
+            event.clientY;
+
+        canvas.setPointerCapture(
+            event.pointerId
+        );
+
+    }
+);
+
+
+canvas.addEventListener(
+    "pointermove",
+    event => {
+
+        if (!mouseDown) {
+            return;
+        }
+
+
+        const deltaX =
+            event.clientX -
+            previousMouseX;
+
+        const deltaY =
+            event.clientY -
+            previousMouseY;
+
+
+        earthGroup.rotation.y +=
+            deltaX * 0.006;
+
+
+        earthGroup.rotation.x +=
+            deltaY * 0.003;
+
+
+        earthGroup.rotation.x =
+            Math.max(
+                -0.5,
+                Math.min(
+                    0.5,
+                    earthGroup.rotation.x
+                )
+            );
+
+
+        rotationVelocity =
+            deltaX * 0.0005;
+
+
+        previousMouseX =
+            event.clientX;
+
+        previousMouseY =
+            event.clientY;
+
+    }
+);
+
+
+canvas.addEventListener(
+    "pointerup",
+    () => {
+
+        mouseDown = false;
+
+    }
+);
+
+
+canvas.addEventListener(
+    "pointerleave",
+    () => {
+
+        mouseDown = false;
+
+    }
+);
+
+
+
+// ZOOM
+
+canvas.addEventListener(
+    "wheel",
+    event => {
+
+        event.preventDefault();
+
+
+        camera.position.z +=
+            event.deltaY * 0.001;
+
+
+        camera.position.z =
+            Math.max(
+                2.1,
+                Math.min(
+                    4.5,
+                    camera.position.z
+                )
+            );
+
+    },
+    { passive: false }
+);
+
+
+
+// ANIMATION
+
+function animate() {
+
+    requestAnimationFrame(
+        animate
+    );
+
+
+    // Automatic rotation
+    if (!mouseDown) {
+
+        earthGroup.rotation.y +=
+            0.0015 +
+            rotationVelocity;
+
+        rotationVelocity *= 0.96;
+
+    }
+
+
+    // Slowly rotate orbit rings
+    orbit1.rotation.z +=
+        0.0005;
+
+    orbit2.rotation.z -=
+        0.0003;
+
+
+    // Slowly move stars
+    stars.rotation.y +=
+        0.0001;
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+
+animate();
+
+
+
+// RESPONSIVE
+
+function resizeGlobe() {
+
+    const width =
+        canvas.clientWidth;
+
+    const height =
+        canvas.clientHeight;
+
+
+    if (
+        width === 0 ||
+        height === 0
+    ) {
+        return;
+    }
+
+
+    camera.aspect =
+        width / height;
+
+    camera.updateProjectionMatrix();
+
+
+    renderer.setSize(
+        width,
+        height,
+        false
+    );
+
+}
+
+
+window.addEventListener(
+    "resize",
+    resizeGlobe
+);
+
+
+resizeGlobe();
+
+</script>
+
+</body>
+</html>
