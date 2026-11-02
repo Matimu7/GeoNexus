@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GEONEXUS | 2D Route</title>
+<link rel="icon" type="image/png" href="G-logo.png">
+<link rel="stylesheet" href="route.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+
+</head>
+<body>
+  <header>
+     <div class="brand">
+       <img src="G-logo.png" alt="GeoNexus logo" class="brand-logo">
+       <h1>GEONEXUS</h1>
+     </div>
+     <span>Campus route</span>
+   </header>
+
+  <form class="controls" id="routeForm">
+    <div>
+      <label for="selStart">START</label>
+      <select id="selStart"></select>
+    </div>
+    <div>
+      <label for="selDest">DESTINATION</label>
+      <select id="selDest"></select>
+    </div>
+    <button type="submit">Show route</button>
+  </form>
+
+  <div id="status" role="status" aria-live="polite">Loading campus data…</div>
+  <div id="map"></div>
+
+  <div class="summary">
+    <div><small>Start</small><strong id="cardStart">–</strong></div>
+    <div><small>Destination</small><strong id="cardDest">–</strong></div>
+    <div><small>Walking</small><strong id="cardEta">–</strong></div>
+  </div>
+
+  <div class="end-row">
+    <button class="danger" id="btnEnd" type="button" hidden>End routing</button>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="config.js"></script>
+<script src="routing.js"></script>
+
+</body>
+</html>
