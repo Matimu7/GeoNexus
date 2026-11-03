@@ -6,6 +6,7 @@
     <title>GEONEXUS</title>
     <link rel="icon" type="image/png" href="G-logo.png">
     <link rel="stylesheet" href="Styles.css">
+    <link rel="stylesheet" href="blog.css">
     <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Widgets/widgets.css">
 </head>
 <body>
@@ -97,7 +98,7 @@
                     <h3>Data and Network Analysis Process</h3>
                     <p>How we used buffers, centroids and a distance matrix to build an evenly spread, connected campus network.</p>
                     <img src="buffer2.png" alt="Intersecting buffer overlay">
-                    <p><a href="#blog" data-link="blog" class="text-link">Read the full post</a></p>
+                    <p><a href="blog-network-analysis.html" class="text-link">Read the full post</a></p>
                 </article>
             </div>
 
@@ -196,84 +197,38 @@
             <h2>Nexus Feed</h2>
             <hr>
 
-            <div class="blog-feed">
-                <article>
-                    <h3>Field Data Collection Process <span class="dot online"></span></h3>
-                    <p>You cannot build a good spatial model without solid ground-truth data. This week, we stepped away from the lab to map the pathways and nodes that will run our Smart Campus navigation dashboard system.</p>
+            <div class="post-list">
 
-                    <h4>Prepping the Tools</h4>
-                    <p>Before heading outside, we set up our data collection forms in QField. Getting our database schemas sorted beforehand meant that once we were on campus, logging the points and attributes was quick and standardized.</p>
-
-                    <h4>On the Ground at Hatfield Campus</h4>
-
-                    <!-- Side-by-side images for static maps -->
-                    <div class="image-row">
-                        <img src="static.jpeg" alt="In front of the Static Map" class="zoomable-img">
-                        <img src="static2.jpeg" alt="Second view of Static Map" class="zoomable-img">
+                <article class="post-card">
+                    <a class="post-thumb" href="blog-network-analysis.html"><img src="buffer2.png" alt="Intersecting buffer overlay"></a>
+                    <div class="post-body">
+                        <div class="post-meta"><time datetime="2026-10-05">5 October 2026</time><span class="tag">Spatial Analysis</span></div>
+                        <h3><a href="blog-network-analysis.html">Data and Network Analysis Process</a></h3>
+                        <p>How we used buffers, centroids and a distance matrix to build an evenly spread, connected campus network.</p>
+                        <a href="blog-network-analysis.html" class="read-more">Read more →</a>
                     </div>
-
-                    <p>We headed out across the Hatfield campus to track down our key navigational assets. We used our mobile setups to capture the exact point coordinates of the existing infrastructure. It is one thing to look at an aerial orthophoto, but being on the ground is the only way to accurately log the specific locations of turnstile entrances, static maps, sign boards, and old LCD displays, and make sure they are properly tied to the closest buildings.</p>
-
-                    <div class="image-row">
-                        <img src="data_capture.jpeg" alt="Using QField to collect data" class="zoomable-img">
-                        <img src="qfield.jpg" alt="QField interface during data collection" class="zoomable-img">
-                    </div>
-
-                    <h4>What We Mapped</h4>
-                    <p>Using QField, we focused specifically on capturing existing navigational assets around campus. We logged:</p>
-                    <ul>
-                        <li>Turnstile entrances</li>
-                        <li>Static maps</li>
-                        <li>Sign boards</li>
-                        <li>Old LCD displays</li>
-                    </ul>
-                    <p>For every point we collected, we also recorded its attributes by noting the closest landmark or building to tie it accurately to the campus network.</p>
-
-                    <h4>Back to the Lab</h4>
-                    <p>Now that the raw spatial data is collected, we are taking it back into QGIS. The next step is to clean up the topology, run our location-allocation models, and integrate everything into the 3D visualization.</p>
-
-                    <img src="points_in_qgis.png" alt="Raw field points imported into QGIS" class="zoomable-img">
                 </article>
 
-                <article>
-                    <h3>Digitising and 3D Model Creation <span class="dot online"></span></h3>
-                    <p>After collecting the field data, the next step was to configure the LiDAR so that it highlighted buildings specifically. This allowed the dataset to serve as a reliable guide during the digitizing process. By focusing on building structures, the LiDAR provided a clear framework for accurate mapping and ensured that the digitized features aligned with real-world conditions.</p>
-
-                    <p>Once the LiDAR was set up, the digitizing process began. All buildings within the study area were carefully digitized, along with the pathways that connected them. This step was crucial because it transformed raw spatial data into usable vector features, forming the foundation for subsequent modeling. The inclusion of pathways added an important layer of connectivity, making the dataset more comprehensive.</p>
-
-                    <img src="Digitized.png" alt="Digitized buildings and pathways" class="zoomable-img">
-
-                    <h4>Bringing the Environment to Life</h4>
-                    <p>After digitizing, the workflow progressed to the creation of a 3D model. The digitized buildings were extruded to represent their heights, while pathways were integrated to reflect the spatial layout of the area. This 3D model provided a more realistic visualization of the environment, enabling better analysis of spatial relationships and offering a powerful tool for presentation and interpretation.</p>
-
-                    <img src="Model.png" alt="3D model extrusion of campus buildings" class="zoomable-img">
-                </article>
-
-                <article>
-                    <h3>Data and Network Analysis Process <span class="dot online"></span></h3>
-                    <p>After completing the 3D model, the workflow advanced into spatial analysis using map screens. The first step was to generate buffers around the buildings and their entrances. These buffers created zones of influence, which helped in identifying areas of potential interaction between structures and access points. By intersecting the buffers, polygons were formed that represented overlapping areas of influence.</p>
-
-                    <!-- Buffer & Final Point Images Row -->
-                    <div class="blog-image-grid">
-                        <figure>
-                            <img src="buffer1.png" alt="Building and Entrance Buffers" class="zoomable-img">
-                            <figcaption>Building Buffers</figcaption>
-                        </figure>
-                        <figure>
-                            <img src="buffer2.png" alt="Intersecting Buffer Overlay" class="zoomable-img">
-                            <figcaption>Buffer Intersections</figcaption>
-                        </figure>
-                        <figure>
-                            <img src="finalpoint.png" alt="Final Snapped Network Points" class="zoomable-img">
-                            <figcaption>Final Snapped Points</figcaption>
-                        </figure>
+                <article class="post-card">
+                    <a class="post-thumb" href="blog-digitising-3d-model.html"><img src="Digitized.png" alt="Digitized buildings and pathways"></a>
+                    <div class="post-body">
+                        <div class="post-meta"><time datetime="2026-09-07">7 September 2026</time><span class="tag">Digitising &amp; 3D</span></div>
+                        <h3><a href="blog-digitising-3d-model.html">Digitising and 3D Model Creation</a></h3>
+                        <p>Using LiDAR as a guide, we digitised every building and pathway, then extruded the buildings into a 3D campus model.</p>
+                        <a href="blog-digitising-3d-model.html" class="read-more">Read more →</a>
                     </div>
-
-                    <h4>Refining Spatial Connectivity</h4>
-                    <p>From these intersection polygons, the centroids function was applied to calculate central points. These centroids acted as representative locations within each overlap zone. To integrate them into the network, the centroids were snapped to the pathway layer, ensuring that they aligned with existing circulation routes. This step was important for maintaining spatial connectivity and realism in the analysis.</p>
-
-                    <p>However, snapping centroids to pathways sometimes resulted in clusters of points in certain areas. To address this, the distance matrix function was used. This function calculates the Euclidean distance between points, allowing for the identification and reduction of clustering. By applying it, the dataset was refined to ensure that points were more evenly distributed, improving the accuracy and usability of the analysis.</p>
                 </article>
+
+                <article class="post-card">
+                    <a class="post-thumb" href="blog-field-data-collection.html"><img src="static.jpeg" alt="In front of the Static Map"></a>
+                    <div class="post-body">
+                        <div class="post-meta"><time datetime="2026-08-18">18 August 2026</time><span class="tag">Fieldwork</span></div>
+                        <h3><a href="blog-field-data-collection.html">Field Data Collection Process</a></h3>
+                        <p>We took QField out onto Hatfield Campus to log turnstiles, static maps, sign boards and old LCD displays.</p>
+                        <a href="blog-field-data-collection.html" class="read-more">Read more →</a>
+                    </div>
+                </article>
+
             </div>
         </section>
     </main>

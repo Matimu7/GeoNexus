@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digitising and 3D Model Creation | GEONEXUS</title>
+    <link rel="icon" type="image/png" href="G-logo.png">
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="stylesheet" href="blog.css">
+</head>
+<body>
+
+    <header>
+        <a href="index.html#home" class="brand">
+            <img src="G-logo.png" alt="GeoNexus logo" class="brand-logo">
+            <h1>GEONEXUS</h1>
+        </a>
+        <p>VISION INTO IMMERSIVE REALITY</p>
+    </header>
+
+    <nav>
+        <a href="index.html#home">Home</a>
+        <a href="index.html#about">About</a>
+        <a href="index.html#blog">Blog</a>
+        <a href="index.html#map">3D Model</a>
+    </nav>
+
+    <main class="post-page">
+        <a href="index.html#blog" class="back-link">← Back to Nexus Feed</a>
+
+        <article>
+            <div class="post-header">
+                <div class="post-meta"><time datetime="2026-09-07">7 September 2026</time><span class="tag">Digitising &amp; 3D</span></div>
+                <h2>Digitising and 3D Model Creation</h2>
+            </div>
+
+            <p>After collecting the field data, the next step was to configure the LiDAR so that it highlighted buildings specifically. This allowed the dataset to serve as a reliable guide during the digitizing process. By focusing on building structures, the LiDAR provided a clear framework for accurate mapping and ensured that the digitized features aligned with real-world conditions.</p>
+
+            <p>Once the LiDAR was set up, the digitizing process began. All buildings within the study area were carefully digitized, along with the pathways that connected them. This step was crucial because it transformed raw spatial data into usable vector features, forming the foundation for subsequent modeling. The inclusion of pathways added an important layer of connectivity, making the dataset more comprehensive.</p>
+
+            <img src="Digitized.png" alt="Digitized buildings and pathways">
+
+            <h4>Bringing the Environment to Life</h4>
+            <p>After digitizing, the workflow progressed to the creation of a 3D model. The digitized buildings were extruded to represent their heights, while pathways were integrated to reflect the spatial layout of the area. This 3D model provided a more realistic visualization of the environment, enabling better analysis of spatial relationships and offering a powerful tool for presentation and interpretation.</p>
+
+            <img src="Model.png" alt="3D model extrusion of campus buildings">
+        </article>
+
+        <hr>
+
+        <div class="post-nav">
+            <a href="blog-field-data-collection.html">← Previous: Field Data Collection Process</a>
+            <a href="blog-network-analysis.html">Next: Data and Network Analysis Process →</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 GEONEXUS Systems. All rights reserved.</p>
+    </footer>
+
+    <div class="lightbox" id="lightbox"><img alt="Enlarged view"></div>
+    <script>
+        const lb = document.getElementById('lightbox');
+        const lbImg = lb.querySelector('img');
+        document.querySelectorAll('.post-page article img').forEach(img => {
+            img.addEventListener('click', () => { lbImg.src = img.src; lbImg.alt = img.alt; lb.classList.add('open'); });
+        });
+        lb.addEventListener('click', () => lb.classList.remove('open'));
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+    </script>
+</body>
+</html>

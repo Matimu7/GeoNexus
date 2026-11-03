@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data and Network Analysis Process | GEONEXUS</title>
+    <link rel="icon" type="image/png" href="G-logo.png">
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="stylesheet" href="blog.css">
+</head>
+<body>
+
+    <header>
+        <a href="index.html#home" class="brand">
+            <img src="G-logo.png" alt="GeoNexus logo" class="brand-logo">
+            <h1>GEONEXUS</h1>
+        </a>
+        <p>VISION INTO IMMERSIVE REALITY</p>
+    </header>
+
+    <nav>
+        <a href="index.html#home">Home</a>
+        <a href="index.html#about">About</a>
+        <a href="index.html#blog">Blog</a>
+        <a href="index.html#map">3D Model</a>
+    </nav>
+
+    <main class="post-page">
+        <a href="index.html#blog" class="back-link">← Back to Nexus Feed</a>
+
+        <article>
+            <div class="post-header">
+                <div class="post-meta"><time datetime="2026-10-05">5 October 2026</time><span class="tag">Spatial Analysis</span></div>
+                <h2>Data and Network Analysis Process</h2>
+            </div>
+
+            <p>After completing the 3D model, the workflow advanced into spatial analysis using map screens. The first step was to generate buffers around the buildings and their entrances. These buffers created zones of influence, which helped in identifying areas of potential interaction between structures and access points. By intersecting the buffers, polygons were formed that represented overlapping areas of influence.</p>
+
+            <div class="blog-image-grid">
+                <figure>
+                    <img src="buffer1.png" alt="Building and Entrance Buffers">
+                    <figcaption>Building Buffers</figcaption>
+                </figure>
+                <figure>
+                    <img src="buffer2.png" alt="Intersecting Buffer Overlay">
+                    <figcaption>Buffer Intersections</figcaption>
+                </figure>
+                <figure>
+                    <img src="finalpoint.png" alt="Final Snapped Network Points">
+                    <figcaption>Final Snapped Points</figcaption>
+                </figure>
+            </div>
+
+            <h4>Refining Spatial Connectivity</h4>
+            <p>From these intersection polygons, the centroids function was applied to calculate central points. These centroids acted as representative locations within each overlap zone. To integrate them into the network, the centroids were snapped to the pathway layer, ensuring that they aligned with existing circulation routes. This step was important for maintaining spatial connectivity and realism in the analysis.</p>
+
+            <p>However, snapping centroids to pathways sometimes resulted in clusters of points in certain areas. To address this, the distance matrix function was used. This function calculates the Euclidean distance between points, allowing for the identification and reduction of clustering. By applying it, the dataset was refined to ensure that points were more evenly distributed, improving the accuracy and usability of the analysis.</p>
+        </article>
+
+        <hr>
+
+        <div class="post-nav">
+            <a href="blog-digitising-3d-model.html">← Previous: Digitising and 3D Model Creation</a>
+            <span></span>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 GEONEXUS Systems. All rights reserved.</p>
+    </footer>
+
+    <div class="lightbox" id="lightbox"><img alt="Enlarged view"></div>
+    <script>
+        const lb = document.getElementById('lightbox');
+        const lbImg = lb.querySelector('img');
+        document.querySelectorAll('.post-page article img').forEach(img => {
+            img.addEventListener('click', () => { lbImg.src = img.src; lbImg.alt = img.alt; lb.classList.add('open'); });
+        });
+        lb.addEventListener('click', () => lb.classList.remove('open'));
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+    </script>
+</body>
+</html>

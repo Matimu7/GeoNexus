@@ -1,0 +1,201 @@
+/* ===== BLOG: preview cards (index.html) ===== */
+.post-list {
+    display: grid;
+    gap: 28px;
+}
+
+.post-card {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    background: rgba(4, 8, 16, 0.6);
+    border-left: 4px solid var(--accent);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    overflow: hidden;
+}
+
+.post-card:hover {
+    border-left-color: var(--accent-bright);
+    box-shadow: -4px 0 20px rgba(72, 229, 194, 0.15);
+    transform: translateY(-2px);
+}
+
+.post-card .post-thumb {
+    display: block;
+    height: 200px;
+    min-height: 0;
+    overflow: hidden;
+    background: #020408;
+}
+
+.post-card .post-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.post-card .post-body {
+    padding: 18px 22px;
+}
+
+.post-card h3 {
+    margin: 4px 0 8px;
+}
+
+.post-card h3 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.post-card h3 a:hover {
+    color: #fff;
+}
+
+.post-meta {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+}
+
+.post-meta .tag {
+    color: var(--accent);
+    margin-left: 10px;
+}
+
+.post-card p {
+    margin: 0 0 12px;
+}
+
+.read-more {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent-bright);
+    text-decoration: none;
+}
+
+.read-more:hover {
+    text-shadow: 0 0 8px rgba(72, 229, 194, 0.7);
+}
+
+/* ===== BLOG: single post page ===== */
+.post-page {
+    max-width: 820px;
+}
+
+.post-page .post-header h2 {
+    margin: 6px 0 4px;
+    font-size: 1.8rem;
+}
+
+.post-page article img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+    border-radius: 8px;
+    cursor: zoom-in;
+}
+
+.post-page .image-row,
+.post-page .blog-image-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* make every photo in a row the same size */
+.post-page .image-row img {
+    width: 100%;
+    aspect-ratio: 1 / 1;      /* square; try 4 / 3 for wider photos */
+    object-fit: cover;
+    object-position: center 65%;   /* keeps the sign and person in frame */
+    margin: 0;
+}
+
+.post-page .blog-image-grid img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    margin: 0;
+}
+
+.post-page .blog-image-grid figure {
+    margin: 0;
+}
+
+.post-page figcaption {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 12px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.back-link:hover {
+    color: var(--accent-bright);
+}
+
+.post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.post-nav a {
+    color: var(--accent);
+    text-decoration: none;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+}
+
+.post-nav a:hover {
+    color: var(--accent-bright);
+}
+
+/* simple lightbox for post pages */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 4, 8, 0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    cursor: zoom-out;
+}
+
+.lightbox.open {
+    display: flex;
+}
+
+.lightbox img {
+    max-width: 92vw;
+    max-height: 92vh;
+}
+
+@media (max-width: 700px) {
+    .post-card {
+        grid-template-columns: 1fr;
+    }
+
+    .post-card .post-thumb {
+        min-height: 160px;
+        height: 160px;
+    }
+}
