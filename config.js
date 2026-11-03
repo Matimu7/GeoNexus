@@ -17,9 +17,16 @@ window.GEONEXUS = {
         ROUTE_COLOR: "#ec4899",
         START_COLOR: "#22c55e",
         DESTINATION_COLOR: "#ef4444"
+    },
+
+    // ADD THIS FUNCTION HERE:
+    getRouteUrl: function (destId, startId = "USER_GPS_LOCATION") {
+        const base = this.PUBLIC_BASE_URL.endsWith("/")
+            ? `${this.PUBLIC_BASE_URL}${this.ROUTE_PAGE}`
+            : `${this.PUBLIC_BASE_URL}/${this.ROUTE_PAGE}`;
+        return `${base}?s=${encodeURIComponent(startId)}&d=${encodeURIComponent(destId)}`;
     }
 };
-
 
 // ==========================================
 // GEONEXUS PATH ROUTER
