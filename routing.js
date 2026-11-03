@@ -1,16 +1,8 @@
-/*
- * GeoNexus - 2D port of the pathway routing used in the Cesium app (app.js).
- *
- * Same method, so the 2D route matches the 3D route:
- *   - every pathway segment is split where it crosses another segment
- *   - T-junctions / near misses within 1.5 m are treated as connected
- *   - nodes closer than 1.5 m are merged
- *   - a building centre is snapped to the nearest pathway EDGE (not node)
- *   - shortest path by distance (Dijkstra; A* in the 3D app gives the same length)
- *
- * Input is GeoJSON in EPSG:4326 (lon/lat). Output paths are [lat, lng] for Leaflet.
- */
-(function (global) {
+// ==========================================
+// GEONEXUS PATH ROUTER
+// ==========================================
+
+window.PathRouter = (function () {
   "use strict";
 
   const EARTH = 6378137;
@@ -26,6 +18,22 @@
       else if (g.type === "MultiLineString") g.coordinates.forEach((l) => lines.push(l));
     });
     return lines;
+  }
+
+  function extractPoints(geojson, nameProperty) {
+    const points = [];
+    ((geojson && geojson.features) || []).forEach((f, index) => {
+      const g = f.geometry;
+      if (!g || g.type !== "Point") return;
+      const props = f.properties || {};
+      const name = props[nameProperty] || props.name || props.Name || `Point ${index + 1}`;
+      points.push({
+        id: index,
+        name: String(name),
+        coordinates: g.coordinates // Standard GeoJSON [lng, lat]
+      });
+    });
+    return points;
   }
 
   class Heap {
@@ -67,7 +75,7 @@
     const rx = a2.x - a1.x, ry = a2.y - a1.y;
     const sx = b2.x - b1.x, sy = b2.y - b1.y;
     const denom = rx * sy - ry * sx;
-    if (Math.abs(denom) < 1e-9) return null; // parallel
+    if (Math.abs(denom) < 1e-9) return null;
     const qx = b1.x - a1.x, qy = b1.y - a1.y;
     const t = (qx * sy - qy * sx) / denom;
     const u = (qx * ry - qy * rx) / denom;
@@ -86,14 +94,14 @@
   const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
 
   class PathNetwork {
-    constructor(geojson, options) {
+    constructor(pathwaysGeojson, options) {
       this.tol = (options && options.snapTolerance) || SNAP_TOLERANCE;
-      this.nodes = [];   // { lonlat, xy, nb: Map(index -> metres) }
-      this.edges = [];   // [i, j] with i < j
+      this.nodes = [];
+      this.edges = [];
       this.origin = null;
       this._grid = new Map();
 
-      const lines = extractLines(geojson);
+      const lines = extractLines(pathwaysGeojson);
       for (const line of lines) {
         if (line.length && !this.origin) {
           this.origin = { lon: line[0][0] * RAD, lat: line[0][1] * RAD };
@@ -175,7 +183,6 @@
       this.nodes[b].nb.set(a, d);
     }
 
-    // Nearest point on any edge to a [lng, lat] position.
     snap(lonlat) {
       const p = this._xy(lonlat);
       let best = null;
@@ -189,16 +196,11 @@
       return best;
     }
 
-    /**
-     * Shortest walkable route between two [lng, lat] points (e.g. building centres).
-     * Returns { path: [[lat, lng], ...], distance } where distance is metres along
-     * the pathways only (same figure the 3D app shows).
-     */
     route(from, to) {
-      if (!this.edges.length) throw new Error("No pathway lines were found. Check Pathways.geojson.");
+      if (!this.edges.length) throw new Error("No pathway lines were found.");
       const s = this.snap(from);
       const e = this.snap(to);
-      if (!s || !e) throw new Error("Could not snap the buildings to the pathway network.");
+      if (!s || !e) throw new Error("Could not snap points to pathway network.");
 
       const S = -1, E = -2;
       const extra = new Map();
@@ -239,20 +241,408 @@
       }
 
       if (!dist.has(E)) {
-        throw new Error("No connected route found. Check that the pathway features connect to one another.");
+        throw new Error("No connected route found.");
       }
 
       const ids = [];
       for (let cur = E; cur !== undefined; cur = prev.get(cur)) ids.push(cur);
       ids.reverse();
 
-      // building centre -> snap point -> pathway nodes -> snap point -> building centre
+      // Ensure output is Leaflet format: [lat, lng]
       const path = [from, ...ids.map(lonlatOf), to].map((c) => [c[1], c[0]]);
       return { path, distance: dist.get(E) };
     }
   }
 
-  const api = { PathNetwork };
-  if (typeof module !== "undefined" && module.exports) module.exports = api;
-  else global.PathRouter = api;
-})(typeof window !== "undefined" ? window : globalThis);
+  return { PathNetwork, extractPoints };
+})();
+
+
+// ==========================================
+// 2D MAP CONTROLLER & UI WITH LIVE GPS
+// ==========================================
+
+(function () {
+  "use strict";
+
+  const CFG = window.GEONEXUS || {};
+  const DATA_CFG = CFG.DATA || {};
+  const ROUTING_CFG = CFG.ROUTING || {};
+  const GPS_START_ID = "USER_GPS_LOCATION";
+  const $ = (id) => document.getElementById(id);
+
+  const setStatus = (msg, isError) => {
+    const statusEl = $("status");
+    if (statusEl) {
+      statusEl.textContent = msg || "";
+      statusEl.className = isError ? "error" : "";
+    }
+  };
+
+  async function fetchJSON(url) {
+    const res = await fetch(url, { cache: "no-cache" });
+    if (!res.ok) throw new Error(`Could not load ${url} (HTTP ${res.status})`);
+    return res.json();
+  }
+
+  const mapContainer = $("map");
+  if (!mapContainer) return;
+
+  const map = L.map("map", { zoomControl: true }).setView([-25.7545, 28.2315], 17);
+
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  const layers = {
+    aoi: L.layerGroup().addTo(map),
+    buildings: L.layerGroup().addTo(map),
+    paths: L.layerGroup().addTo(map),
+    route: L.layerGroup().addTo(map),
+    userLocation: L.layerGroup().addTo(map)
+  };
+
+  let network = null;
+  let screens = [];
+  let entrances = [];
+
+  // Mobile Geolocation State
+  let userCoords = null; // Stores latest [lng, lat]
+  let watchId = null;
+
+  function findItem(list, param) {
+    if (param === null || param === undefined || param === "") return null;
+    if (param === GPS_START_ID) {
+      if (!userCoords) return null;
+      return {
+        id: GPS_START_ID,
+        name: "My Current Location",
+        coordinates: userCoords
+      };
+    }
+    const q = String(param).trim();
+    return (
+      list.find((item) => String(item.id) === q) ||
+      list.find((item) => item.name.toLowerCase() === q.toLowerCase()) ||
+      null
+    );
+  }
+
+  function fillSelect(sel, list, placeholder, includeGpsOption = false) {
+    if (!sel) return;
+    sel.replaceChildren();
+    const ph = document.createElement("option");
+    ph.value = "";
+    ph.textContent = placeholder;
+    sel.appendChild(ph);
+
+    if (includeGpsOption) {
+      const gpsOpt = document.createElement("option");
+      gpsOpt.value = GPS_START_ID;
+      gpsOpt.textContent = "📍 My Current Location";
+      sel.appendChild(gpsOpt);
+    }
+
+    [...list]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .forEach((item) => {
+        const o = document.createElement("option");
+        o.value = item.id;
+        o.textContent = item.name;
+        sel.appendChild(o);
+      });
+  }
+
+  function setURLParams(s, d) {
+    const url = new URL(window.location.href);
+    ["s", "d"].forEach((k) => url.searchParams.delete(k));
+    if (s !== null && d !== null) {
+      url.searchParams.set("s", s);
+      url.searchParams.set("d", d);
+    }
+    history.replaceState(null, "", url.toString());
+  }
+
+  function startLocationTracking(autoRouteTargetDest = null) {
+    if (!("geolocation" in navigator)) {
+      setStatus("Geolocation is not supported by your browser.", true);
+      return;
+    }
+
+    if (watchId !== null) return; // Already watching
+
+    setStatus("Acquiring GPS position...");
+
+    watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const accuracy = position.coords.accuracy;
+
+        userCoords = [lng, lat];
+        layers.userLocation.clearLayers();
+
+        // Accuracy radius blue circle
+        L.circle([lat, lng], {
+          radius: accuracy,
+          color: "#3b82f6",
+          fillColor: "#3b82f6",
+          fillOpacity: 0.15,
+          weight: 1,
+          interactive: false
+        }).addTo(layers.userLocation);
+
+        // Marker for user position
+        L.circleMarker([lat, lng], {
+          radius: 8,
+          color: "#ffffff",
+          weight: 2,
+          fillColor: "#2563eb",
+          fillOpacity: 1
+        }).bindTooltip("Your Location", { direction: "top", offset: [0, -10] })
+          .addTo(layers.userLocation);
+
+        // Dynamic re-route if navigating from Current Location
+        const startSelect = $("selStart");
+        const endSelect = $("selDest");
+
+        if (startSelect && startSelect.value === GPS_START_ID) {
+          const dest = autoRouteTargetDest || (endSelect ? findItem(entrances, endSelect.value) : null);
+          if (dest) {
+            const userStart = {
+              id: GPS_START_ID,
+              name: "My Current Location",
+              coordinates: userCoords
+            };
+            showRoute(userStart, dest);
+          }
+        }
+      },
+      (err) => {
+        const msgs = {
+          1: "Location permission denied.",
+          2: "GPS position unavailable.",
+          3: "GPS request timed out."
+        };
+        setStatus(msgs[err.code] || "Location tracking error.", true);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 2000,
+        timeout: 10000
+      }
+    );
+  }
+
+  function stopLocationTracking() {
+    if (watchId !== null) {
+      navigator.geolocation.clearWatch(watchId);
+      watchId = null;
+    }
+    layers.userLocation.clearLayers();
+    userCoords = null;
+  }
+
+  function showRoute(start, dest) {
+    layers.route.clearLayers();
+
+    let r;
+    try {
+      r = network.route(start.coordinates, dest.coordinates);
+    } catch (err) {
+      setStatus(err.message, true);
+      return;
+    }
+
+    const routeColor = ROUTING_CFG.ROUTE_COLOR || "#ec4899";
+    const startColor = ROUTING_CFG.START_COLOR || "#22c55e";
+    const destColor = ROUTING_CFG.DESTINATION_COLOR || "#ef4444";
+
+    L.polyline(r.path, { color: "#ffffff", weight: 8, opacity: 0.9 }).addTo(layers.route);
+    const line = L.polyline(r.path, { color: routeColor, weight: 5, opacity: 1 }).addTo(layers.route);
+
+    const dot = (latLng, color, text, customClass) =>
+      L.circleMarker(latLng, {
+        radius: 8, color: "#ffffff", weight: 2, fillColor: color, fillOpacity: 1
+      }).bindTooltip(text, { permanent: true, direction: "top", offset: [0, -10], className: customClass }).addTo(layers.route);
+
+    const startLatLng = [start.coordinates[1], start.coordinates[0]];
+    const destLatLng = [dest.coordinates[1], dest.coordinates[0]];
+
+    dot(startLatLng, startColor, `START: ${start.name}`, "label-start");
+    dot(destLatLng, destColor, `END: ${dest.name}`, "label-end");
+
+    map.fitBounds(line.getBounds(), { padding: [50, 50] });
+
+    const walkSpeed = ROUTING_CFG.WALK_SPEED_MS || 1.4;
+    const mins = Math.max(1, Math.round(r.distance / walkSpeed / 60));
+
+    if ($("cardStart")) $("cardStart").textContent = start.name;
+    if ($("cardDest")) $("cardDest").textContent = dest.name;
+    if ($("cardEta")) $("cardEta").textContent = `≈ ${mins} min (${Math.round(r.distance)} m)`;
+
+    const startSelect = $("selStart");
+    const endSelect = $("selDest");
+    if (startSelect) startSelect.value = start.id;
+    if (endSelect) endSelect.value = dest.id;
+
+    if ($("btnEnd")) $("btnEnd").hidden = false;
+
+    if (start.id !== GPS_START_ID) {
+      setURLParams(start.id, dest.id);
+    }
+    setStatus(`Route calculated: ${start.name} → ${dest.name}`);
+  }
+
+  async function init() {
+    try {
+      const screensUrl = CFG.SCREENS_URL || "Dashboard_loc.geojson";
+      const entrancesUrl = CFG.ENTRANCES_URL || "building_entrances.geojson";
+      const pathwaysUrl = DATA_CFG.PATHWAYS || "Pathways.geojson";
+      const buildingsUrl = DATA_CFG.BUILDINGS || "Buildings.geojson";
+      const aoiUrl = DATA_CFG.AOI || "campus_aoi.geojson";
+
+      const [sGeo, eGeo, pGeo] = await Promise.all([
+        fetchJSON(screensUrl),
+        fetchJSON(entrancesUrl),
+        fetchJSON(pathwaysUrl)
+      ]);
+
+      screens = PathRouter.extractPoints(sGeo, "LCD Display Name");
+      entrances = PathRouter.extractPoints(eGeo, "Entrance Name");
+      network = new PathRouter.PathNetwork(pGeo);
+
+      try {
+        const bGeo = await fetchJSON(buildingsUrl);
+        L.geoJSON(bGeo, {
+          style: {
+            color: "#475569",
+            weight: 1,
+            fillColor: "#FFE5B4",
+            fillOpacity: 0.4
+          }
+        }).addTo(layers.buildings);
+      } catch (e) {
+        console.warn("Buildings dataset optional render skipped:", e);
+      }
+
+      L.geoJSON(pGeo, {
+        style: { color: "#24fb5a", weight: 3, opacity: 0.6 },
+        interactive: false
+      }).addTo(layers.paths);
+
+      try {
+        const aoiGeo = await fetchJSON(aoiUrl);
+        const aoiLayer = L.geoJSON(aoiGeo, {
+          style: { color: "#ef4444", weight: 2, fillOpacity: 0.05 },
+          interactive: false
+        }).addTo(layers.aoi);
+
+        if (aoiLayer.getBounds().isValid()) {
+          map.fitBounds(aoiLayer.getBounds());
+        }
+      } catch (e) {
+        const pBounds = L.geoJSON(pGeo).getBounds();
+        if (pBounds.isValid()) map.fitBounds(pBounds);
+      }
+
+      const startSelect = $("selStart");
+      const endSelect = $("selDest");
+
+      fillSelect(startSelect, screens, "Select starting display screen", true);
+      fillSelect(endSelect, entrances, "Select destination entrance", false);
+
+      // Listener for start select dropdown change
+      if (startSelect) {
+        startSelect.addEventListener("change", (e) => {
+          if (e.target.value === GPS_START_ID) {
+            startLocationTracking();
+          } else if (watchId !== null) {
+            stopLocationTracking();
+          }
+        });
+      }
+
+      setStatus("");
+      setTimeout(() => map.invalidateSize(), 200);
+
+    } catch (err) {
+      console.error(err);
+      setStatus(`${err.message}. Ensure files are served over HTTP/HTTPS.`, true);
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("s") && params.has("d")) {
+      const s = findItem(screens, params.get("s"));
+      const d = findItem(entrances, params.get("d"));
+      if (s && d) {
+        showRoute(s, d);
+      } else {
+        setStatus("Target display screen or building entrance point was not found.", true);
+      }
+    }
+  }
+
+  const showRouteForm = $("routeForm");
+  if (showRouteForm) {
+    showRouteForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const startSelect = $("selStart");
+      const endSelect = $("selDest");
+
+      if (!startSelect || !endSelect) return;
+
+      const d = findItem(entrances, endSelect.value);
+
+      if (startSelect.value === GPS_START_ID) {
+        if (!d) {
+          setStatus("Please select a destination entrance.", true);
+          return;
+        }
+        if (!userCoords) {
+          startLocationTracking(d);
+        } else {
+          const s = {
+            id: GPS_START_ID,
+            name: "My Current Location",
+            coordinates: userCoords
+          };
+          showRoute(s, d);
+        }
+        return;
+      }
+
+      const s = findItem(screens, startSelect.value);
+      if (!s || !d) {
+        setStatus("Please select both a start location and a destination entrance.", true);
+        return;
+      }
+      showRoute(s, d);
+    });
+  }
+
+  const endRouteBtn = $("btnEnd");
+  if (endRouteBtn) {
+    endRouteBtn.addEventListener("click", () => {
+      layers.route.clearLayers();
+      stopLocationTracking();
+
+      const startSelect = $("selStart");
+      const endSelect = $("selDest");
+      if (startSelect) startSelect.value = "";
+      if (endSelect) endSelect.value = "";
+
+      if ($("cardStart")) $("cardStart").textContent = "–";
+      if ($("cardDest")) $("cardDest").textContent = "–";
+      if ($("cardEta")) $("cardEta").textContent = "–";
+
+      endRouteBtn.hidden = true;
+      setURLParams(null, null);
+      setStatus("Route cleared.");
+    });
+  }
+
+  init();
+})();
