@@ -3,7 +3,7 @@
 // ==========================================
 
 window.GEONEXUS = {
-    PUBLIC_BASE_URL: "https://Matimu7.github.com/GeoNexus---Website/tree/Edits",
+    PUBLIC_BASE_URL: "https://Matimu7.github.io/GeoNexus---Website/Edits/",
     ROUTE_PAGE: "route.html",
 
     DATA: {
