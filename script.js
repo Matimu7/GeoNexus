@@ -1,73 +1,115 @@
-// --- VIEW SWITCHING (Home / About / Blog / Map) ---
+// --- GEONEXUS UNIFIED SPA ROUTER & VIEW SWITCHER ---
 (function () {
-    const hero = document.getElementById('view-hero');
-    const blog = document.getElementById('view-blog');
-    const map = document.getElementById('view-map');
-    const heroPanels = hero.querySelectorAll('[data-view]');
-    const links = document.querySelectorAll('nav a[data-link]');
-    const valid = ['home', 'about', 'blog', 'map'];
+    function route() {
+        const rawHash = window.location.hash.slice(1) || 'home';
+        const mains = document.querySelectorAll('main');
+        const hero = document.getElementById('view-hero');
+        const heroPanels = hero ? hero.querySelectorAll('[data-view]') : [];
+        const navLinks = document.querySelectorAll('nav a');
 
-    function show(view) {
-        if (!valid.includes(view)) view = 'home';
+        let targetMainId = 'view-hero';
+        let activeSubView = 'home';
 
-        hero.hidden = !(view === 'home' || view === 'about');
-        blog.hidden = view !== 'blog';
-        map.hidden = view !== 'map';
+        // Map hash routes to view containers
+        if (rawHash === 'home' || rawHash === 'about') {
+            targetMainId = 'view-hero';
+            activeSubView = rawHash;
+        } else if (rawHash === 'blog') {
+            targetMainId = 'view-blog';
+        } else if (rawHash === 'map') {
+            targetMainId = 'view-map';
+        } else if (rawHash.startsWith('post-')) {
+            targetMainId = `view-${rawHash}`;
+        }
 
-        heroPanels.forEach(function (p) {
-            p.hidden = p.dataset.view !== view;
+        // 1. Hide all main view sections
+        mains.forEach(main => {
+            main.hidden = true;
         });
 
-        links.forEach(function (a) {
-            a.classList.toggle('active', a.dataset.link === view);
+        // 2. Unhide target main section
+        const activeMain = document.getElementById(targetMainId);
+        if (activeMain) {
+            activeMain.hidden = false;
+        }
+
+        // 3. Toggle inner sub-views for Home and About
+        if (targetMainId === 'view-hero') {
+            heroPanels.forEach(p => {
+                p.hidden = (p.getAttribute('data-view') !== activeSubView);
+            });
+        }
+
+        // 4. Force single active highlight on navigation links
+        navLinks.forEach(a => {
+            a.classList.remove('active');
+
+            const linkTarget = a.getAttribute('data-link');
+            const hrefTarget = a.getAttribute('href') ? a.getAttribute('href').replace('#', '') : '';
+
+            const matchesActiveSubView = (targetMainId === 'view-hero' && (linkTarget === activeSubView || hrefTarget === activeSubView));
+            const matchesDirectHash = (linkTarget === rawHash || hrefTarget === rawHash);
+            const matchesPostToBlog = (rawHash.startsWith('post-') && (linkTarget === 'blog' || hrefTarget === 'blog'));
+
+            if (matchesActiveSubView || matchesDirectHash || matchesPostToBlog) {
+                a.classList.add('active');
+            }
         });
 
         window.scrollTo(0, 0);
 
-        // Let the globe and Cesium re-measure their containers after being shown
-        requestAnimationFrame(function () {
+        // Notify 3D Viewport / Canvas to resize properly after view changes
+        requestAnimationFrame(() => {
             window.dispatchEvent(new Event('resize'));
         });
     }
 
-    window.addEventListener('hashchange', function () {
-        show(location.hash.slice(1));
-    });
-
-    show(location.hash.slice(1));
+    window.addEventListener('hashchange', route);
+    document.addEventListener('DOMContentLoaded', route);
 })();
 
-// Image Maximizer Lightbox functionality
+// --- IMAGE MAXIMIZER LIGHTBOX MODAL ---
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("imageModal");
     const modalImg = document.getElementById("modalImg");
     const captionText = document.getElementById("modalCaption");
     const closeBtn = document.querySelector(".modal-close");
 
-    // Enable zoom on any image with class "zoomable-img" or blog images
-    document.querySelectorAll(".zoomable-img, .blog-feed img").forEach(img => {
-        img.addEventListener("click", function() {
+    // Attach click zoom handler to article and zoomable images
+    document.querySelectorAll(".zoomable-img, article img").forEach(img => {
+        img.addEventListener("click", function () {
             if (modal && modalImg) {
-                modal.style.display = "block";
+                modal.classList.add("open");
+                modal.style.display = "flex";
                 modalImg.src = this.src;
-                captionText.innerHTML = this.alt || "Image View";
+                if (captionText) {
+                    captionText.innerHTML = this.alt || "Image View";
+                }
             }
         });
     });
 
-    // Close modal when clicking 'X'
+    // Close handlers
     if (closeBtn) {
         closeBtn.addEventListener("click", () => {
+            modal.classList.remove("open");
             modal.style.display = "none";
         });
     }
 
-    // Close modal when clicking outside the image
     if (modal) {
         modal.addEventListener("click", (e) => {
             if (e.target === modal) {
+                modal.classList.remove("open");
                 modal.style.display = "none";
             }
         });
     }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal) {
+            modal.classList.remove("open");
+            modal.style.display = "none";
+        }
+    });
 });
