@@ -441,7 +441,7 @@ window.PathRouter = (function () {
       const coordinates = [from, ...ids.map(lonlatOf), to];
       const networkDistance = dist.get(E);
       return {
-        coordinates,                                  // [lng, lat]
+        coordinates,                                // [lng, lat]
         path: coordinates.map((c) => [c[1], c[0]]),   // [lat, lng] for Leaflet
         networkDistance,
         startSnapDistance: s.dist,
@@ -463,40 +463,51 @@ window.PathRouter = (function () {
   "use strict";
 
   const $ = (id) => document.getElementById(id);
+
   // ==========================================
-// GEONEXUS VOICE NARRATION
-// ==========================================
+  // GEONEXUS VOICE NARRATION
+  // ==========================================
 
-const navigationAudio = new Audio();
+  const navigationAudio = new Audio();
 
-let voiceEnabled = false;
-let journeyStarted = false;
+  let voiceEnabled = false;
+  let journeyStarted = false;
 
-let journeyDistance = 0;
-let travelledDistance = 0;
-let lastProgressCoords = null;
+  let journeyDistance = 0;
+  let travelledDistance = 0;
+  let lastProgressCoords = null;
 
-let halfwayPlayed = false;
-let destinationPlayed = false;
+  let halfwayPlayed = false;
+  let destinationPlayed = false;
+  let activeDestination = null;
 
+  // Unlocks audio context on mobile/desktop browsers directly inside a click event
+  function unlockAudio() {
+    navigationAudio.play().then(() => {
+      navigationAudio.pause();
+      navigationAudio.currentTime = 0;
+    }).catch(() => {
+      // Swallowed: Expected during silent warmup attempt
+    });
+  }
 
-// Play a recorded voice message
-function playVoice(fileName) {
-
+  // Play a recorded voice message
+  function playVoice(fileName) {
     navigationAudio.pause();
     navigationAudio.currentTime = 0;
-
     navigationAudio.src = "audio/" + fileName;
 
-    navigationAudio.play().catch(error => {
-        console.log("Voice playback error:", error);
-    });
-}
+    const playPromise = navigationAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        console.warn(`[GEONEXUS Voice] Playback error for audio/${fileName}:`, error);
+      });
+    }
+  }
 
-
-// Prepare a new voice journey
-function prepareVoiceJourney() {
-
+  // Prepare a new voice journey
+  function prepareVoiceJourney() {
+    unlockAudio();
     voiceEnabled = true;
     journeyStarted = false;
 
@@ -506,52 +517,40 @@ function prepareVoiceJourney() {
 
     halfwayPlayed = false;
     destinationPlayed = false;
-}
+  }
 
-
-// Check the student's journey progress
-function updateVoiceProgress(coords) {
-
+  // Check the student's journey progress
+  function updateVoiceProgress(coords) {
     if (!voiceEnabled || !journeyStarted) return;
 
     if (lastProgressCoords) {
+      const movement = metersBetween(lastProgressCoords, coords);
 
-        const movement = metersBetween(lastProgressCoords, coords);
-
-        // Ignore very small GPS movements
-        if (movement >= CFG.routing.gpsMinMove) {
-            travelledDistance += movement;
-        }
+      // Ignore very small GPS movements
+      if (movement >= CFG.routing.gpsMinMove) {
+        travelledDistance += movement;
+      }
     }
 
     lastProgressCoords = coords;
 
     // Check whether the student has reached the destination
-    if (activeDestination &&
-        metersBetween(coords, activeDestination) <= 20) {
-
-        if (!destinationPlayed) {
-
-            playVoice("destination_reached.mp3");
-
-            destinationPlayed = true;
-            voiceEnabled = false;
-        }
-
-        return;
+    if (activeDestination && metersBetween(coords, activeDestination) <= 20) {
+      if (!destinationPlayed) {
+        playVoice("destination_reached.mp3");
+        destinationPlayed = true;
+        voiceEnabled = false;
+      }
+      return;
     }
 
     // Check whether the student is halfway
-    if (travelledDistance >= journeyDistance / 2 &&
-        !halfwayPlayed) {
-
-        playVoice("halfway.mp3");
-
-        halfwayPlayed = true;
+    if (travelledDistance >= journeyDistance / 2 && !halfwayPlayed) {
+      playVoice("halfway.mp3");
+      halfwayPlayed = true;
     }
-}
+  }
 
-let activeDestination = null;
   const mapContainer = $("map");
   if (!mapContainer) return; // not the 2D page (e.g. the 3D page also loads this file)
   if (typeof L === "undefined") {
@@ -728,7 +727,7 @@ let activeDestination = null;
     userCoords = [lng, lat];
     drawUserMarker(lat, lng, accuracy);
     routeFromGps(false);
-     // Check journey progress and play voice messages
+    // Check journey progress and play voice messages
     updateVoiceProgress(userCoords);
   }
 
@@ -804,19 +803,16 @@ let activeDestination = null;
       setStatus(err.message, true);
       return false;
     }
+
     // Start voice narration for a new journey
-if (voiceEnabled && !journeyStarted) {
+    if (voiceEnabled && !journeyStarted) {
+      journeyDistance = r.distance;
+      activeDestination = dest.coordinates;
+      journeyStarted = true;
+      lastProgressCoords = start.coordinates;
 
-    journeyDistance = r.distance;
-
-    activeDestination = dest.coordinates;
-
-    journeyStarted = true;
-
-    lastProgressCoords = start.coordinates;
-
-    playVoice("journey_started.mp3");
-}
+      playVoice("journey_started.mp3");
+    }
 
     layers.route.clearLayers();
 
@@ -981,12 +977,14 @@ if (voiceEnabled && !journeyStarted) {
 
       const d = findItem(entrances, endSelect.value);
 
+      // Prepare voice journey inside direct user click event
+      prepareVoiceJourney();
+
       if (startSelect.value === GPS_START_ID) {
         if (!d) {
           setStatus("Please select a destination entrance.", true);
           return;
         }
-       prepareVoiceJourney();
         pendingDest = d;
         lastRouted = null;
         if (!startLocationTracking({ routing: true })) return;
@@ -1003,20 +1001,23 @@ if (voiceEnabled && !journeyStarted) {
       gpsRouting = false;
       pendingDest = null;
       releaseLocationTracking();
-      
-      prepareVoiceJourney();
+
       if (showRoute(s, d, { fit: true })) {
-
-    // Track the student as they follow the route
-    startLocationTracking({ overlay: true });
-
-}
+        // Track user position as they follow the route
+        startLocationTracking({ overlay: true });
+      }
     });
   }
 
   const endRouteBtn = $("btnEnd");
   if (endRouteBtn) {
     endRouteBtn.addEventListener("click", () => {
+      // Stop audio immediately when ending route
+      navigationAudio.pause();
+      navigationAudio.currentTime = 0;
+      voiceEnabled = false;
+      journeyStarted = false;
+
       gpsRouting = false;
       pendingDest = null;
       lastRouted = null;
