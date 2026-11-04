@@ -39,11 +39,6 @@
                     <a href="Model_3D.html" target="_blank" rel="noopener" class="cta">Open Navigation Model</a>
                     <a href="#blog" data-link="blog" class="cta secondary">Read the blog</a>
                 </div>
-                
-                <hr>
-                <h2>The Origin Story</h2>
-                <p>GEONEXUS was established in 2026 to bridge the gap between physical topography and digital consciousness. Our mission is to seamlessly map the physical world into an immersive, interactive reality framework. We saw that Hatfield Campus at University of Pretoria lacked a comprehensive digital navigation system, and this inspired us to create our solution. Interactive map screens across the campus will provide users with real-time navigation assistance and location-based information.</p>
-                <hr>
 
                 <hr>
 
@@ -100,9 +95,9 @@
                 <h2>From the Nexus Feed</h2>
                 <article class="module-card teaser">
                     <h3>Data and Network Analysis Process</h3>
-                    <p>How we used buffers, centroids and a distance matrix to build an evenly spread, connected campus network.</p>
-                    <img src="buffer2.png" alt="Intersecting buffer overlay">
-                    <p><a href="#blog" data-link="blog" class="text-link">Read the full post</a></p>
+                    <p>How we used buffers, centroids and spatial queries to build an evenly spread, connected campus network.</p>
+                    <img src="final.png" alt="Final Map Screens Overlay">
+                    <p><a href="#post-analysis" data-link="post-analysis" class="text-link">Read the full post</a></p>
                 </article>
             </div>
 
@@ -162,14 +157,14 @@
                     </article>
 
                     <article class="team-card">
-                        <h3>Ofentse Lekhuleni</h3>
-                        <div class="team-image"><img src="OL.png" alt="Ofentse Lekhuleni"></div>
+                        <h3>Group Members</h3>
+                        <div class="team-image"><img src="OL.png" alt="Group Member"></div>
                         <p>Spatial Modelling</p>
                     </article>
 
                     <article class="team-card">
-                        <h3>Tanatswa Makombe</h3>
-                        <div class="team-image"><img src="TM.jpeg" alt="Tanatswa Makombe"></div>
+                        <h3>Group Members</h3>
+                        <div class="team-image"><img src="TM.jpeg" alt="Group Member"></div>
                         <p>Web Architecture</p>
                     </article>
                 </div>
@@ -195,92 +190,229 @@
         </section>
     </main>
 
-    <!-- ===================== BLOG ===================== -->
+    <!-- ===================== BLOG FEED ===================== -->
     <main id="view-blog" hidden>
         <section class="content-full">
             <h2>Nexus Feed</h2>
             <hr>
 
             <div class="blog-feed">
-                <article>
+                <!-- Post 1 Teaser -->
+                <article class="module-card teaser">
+                    <div class="post-meta"><time datetime="2026-08-18">18 August 2026</time><span class="tag">Fieldwork</span></div>
                     <h3>Field Data Collection Process <span class="dot online"></span></h3>
-                    <p>You cannot build a good spatial model without solid ground-truth data. This week, we stepped away from the lab to map the pathways and nodes that will run our Smart Campus navigation dashboard system.</p>
-
-                    <h4>Prepping the Tools</h4>
-                    <p>Before heading outside, we set up our data collection forms in QField. Getting our database schemas sorted beforehand meant that once we were on campus, logging the points and attributes was quick and standardized.</p>
-
-                    <h4>On the Ground at Hatfield Campus</h4>
-
-                    <!-- Side-by-side images for static maps -->
-                    <div class="image-row">
-                        <img src="static.jpeg" alt="In front of the Static Map" class="zoomable-img">
-                        <img src="static2.jpeg" alt="Second view of Static Map" class="zoomable-img">
-                    </div>
-
-                    <p>We headed out across the Hatfield campus to track down our key navigational assets. We used our mobile setups to capture the exact point coordinates of the existing infrastructure. It is one thing to look at an aerial orthophoto, but being on the ground is the only way to accurately log the specific locations of turnstile entrances, static maps, sign boards, and old LCD displays, and make sure they are properly tied to the closest buildings.</p>
-
-                    <div class="image-row">
-                        <img src="data_capture.jpeg" alt="Using QField to collect data" class="zoomable-img">
-                        <img src="qfield.jpg" alt="QField interface during data collection" class="zoomable-img">
-                    </div>
-
-                    <h4>What We Mapped</h4>
-                    <p>Using QField, we focused specifically on capturing existing navigational assets around campus. We logged:</p>
-                    <ul>
-                        <li>Turnstile entrances</li>
-                        <li>Static maps</li>
-                        <li>Sign boards</li>
-                        <li>Old LCD displays</li>
-                    </ul>
-                    <p>For every point we collected, we also recorded its attributes by noting the closest landmark or building to tie it accurately to the campus network.</p>
-
-                    <h4>Back to the Lab</h4>
-                    <p>Now that the raw spatial data is collected, we are taking it back into QGIS. The next step is to clean up the topology, run our location-allocation models, and integrate everything into the 3D visualization.</p>
-
-                    <img src="points_in_qgis.png" alt="Raw field points imported into QGIS" class="zoomable-img">
+                    <p>Ground-truth data collection across Hatfield Campus using QField to capture entrance points, static maps, sign boards, and LCD displays.</p>
+                    <img src="data_capture.jpeg" alt="Using QField to collect data" class="zoomable-img">
+                    <p><a href="#post-field" data-link="post-field" class="text-link">Read full article →</a></p>
                 </article>
 
-                <article>
+                <!-- Post 2 Teaser -->
+                <article class="module-card teaser">
+                    <div class="post-meta"><time datetime="2026-09-07">7 September 2026</time><span class="tag">Digitising &amp; 3D</span></div>
                     <h3>Digitising and 3D Model Creation <span class="dot online"></span></h3>
-                    <p>After collecting the field data, the next step was to configure the LiDAR so that it highlighted buildings specifically. This allowed the dataset to serve as a reliable guide during the digitizing process. By focusing on building structures, the LiDAR provided a clear framework for accurate mapping and ensured that the digitized features aligned with real-world conditions.</p>
-
-                    <p>Once the LiDAR was set up, the digitizing process began. All buildings within the study area were carefully digitized, along with the pathways that connected them. This step was crucial because it transformed raw spatial data into usable vector features, forming the foundation for subsequent modeling. The inclusion of pathways added an important layer of connectivity, making the dataset more comprehensive.</p>
-
+                    <p>LiDAR classification, vectorizing building outlines and pedestrian pathways, and extruding real-world building heights in 3D.</p>
                     <img src="Digitized.png" alt="Digitized buildings and pathways" class="zoomable-img">
-
-                    <h4>Bringing the Environment to Life</h4>
-                    <p>After digitizing, the workflow progressed to the creation of a 3D model. The digitized buildings were extruded to represent their heights, while pathways were integrated to reflect the spatial layout of the area. This 3D model provided a more realistic visualization of the environment, enabling better analysis of spatial relationships and offering a powerful tool for presentation and interpretation.</p>
-
-                    <img src="Model.png" alt="3D model extrusion of campus buildings" class="zoomable-img">
+                    <p><a href="#post-digitising" data-link="post-digitising" class="text-link">Read full article →</a></p>
                 </article>
 
-                <article>
+                <!-- Post 3 Teaser -->
+                <article class="module-card teaser">
+                    <div class="post-meta"><time datetime="2026-10-05">5 October 2026</time><span class="tag">Spatial Analysis</span></div>
                     <h3>Data and Network Analysis Process <span class="dot online"></span></h3>
-                    <p>After completing the 3D model, the workflow advanced into spatial analysis using map screens. The first step was to generate buffers around the buildings and their entrances. These buffers created zones of influence, which helped in identifying areas of potential interaction between structures and access points. By intersecting the buffers, polygons were formed that represented overlapping areas of influence.</p>
-
-                    <!-- Buffer & Final Point Images Row -->
-                    <div class="blog-image-grid">
-                        <figure>
-                            <img src="buffer1.png" alt="Building and Entrance Buffers" class="zoomable-img">
-                            <figcaption>Building Buffers</figcaption>
-                        </figure>
-                        <figure>
-                            <img src="buffer2.png" alt="Intersecting Buffer Overlay" class="zoomable-img">
-                            <figcaption>Buffer Intersections</figcaption>
-                        </figure>
-                        <figure>
-                            <img src="finalpoint.png" alt="Final Snapped Network Points" class="zoomable-img">
-                            <figcaption>Final Snapped Points</figcaption>
-                        </figure>
-                    </div>
-
-                    <h4>Refining Spatial Connectivity</h4>
-                    <p>From these intersection polygons, the centroids function was applied to calculate central points. These centroids acted as representative locations within each overlap zone. To integrate them into the network, the centroids were snapped to the pathway layer, ensuring that they aligned with existing circulation routes. This step was important for maintaining spatial connectivity and realism in the analysis.</p>
-
-                    <p>However, snapping centroids to pathways sometimes resulted in clusters of points in certain areas. To address this, the distance matrix function was used. This function calculates the Euclidean distance between points, allowing for the identification and reduction of clustering. By applying it, the dataset was refined to ensure that points were more evenly distributed, improving the accuracy and usability of the analysis.</p>
+                    <p>Complete 12-step multi-criteria QGIS methodology using entrance buffers, centroids, path snapping, location selection, and layer merging.</p>
+                    <img src="final.png" alt="Final Map Screens Overlay" class="zoomable-img">
+                    <p><a href="#post-analysis" data-link="post-analysis" class="text-link">Read full article →</a></p>
                 </article>
             </div>
         </section>
+    </main>
+
+    <!-- ===================== FULL BLOG POST VIEWS ===================== -->
+
+    <!-- Post 1 Full Article -->
+    <main id="view-post-field" class="post-page" hidden>
+        <a href="#blog" data-link="blog" class="back-link">← Back to Nexus Feed</a>
+        <article>
+            <div class="post-header">
+                <div class="post-meta"><time datetime="2026-08-18">18 August 2026</time><span class="tag">Fieldwork</span></div>
+                <h2>Field Data Collection Process</h2>
+            </div>
+
+            <p>You cannot build a good spatial model without solid ground-truth data. This week, we stepped away from the lab to map the pathways and nodes that will run our Smart Campus navigation dashboard system.</p>
+
+            <h4>Prepping the Tools</h4>
+            <p>Before heading outside, we set up our data collection forms in QField. Getting our database schemas sorted beforehand meant that once we were on campus, logging the points and attributes was quick and standardized.</p>
+
+            <h4>On the Ground at Hatfield Campus</h4>
+            <div class="image-row">
+                <img src="static.jpeg" alt="In front of the Static Map" class="zoomable-img">
+                <img src="static2.jpeg" alt="Second view of Static Map" class="zoomable-img">
+            </div>
+
+            <p>We headed out across the Hatfield campus to track down our key navigational assets. We used our mobile setups to capture the exact point coordinates of the existing infrastructure. It is one thing to look at an aerial orthophoto, but being on the ground is the only way to accurately log the specific locations of turnstile entrances, static maps, sign boards, and old LCD displays, and make sure they are properly tied to the closest buildings.</p>
+
+            <div class="image-row">
+                <img src="data_capture.jpeg" alt="Using QField to collect data" class="zoomable-img">
+                <img src="qfield.jpg" alt="QField interface during data collection" class="zoomable-img">
+            </div>
+
+            <h4>What We Mapped</h4>
+            <p>Using QField, we focused specifically on capturing existing navigational assets around campus. We logged:</p>
+            <ul>
+                <li>Turnstile entrances</li>
+                <li>Static maps</li>
+                <li>Sign boards</li>
+                <li>Old LCD displays</li>
+            </ul>
+            <p>For every point we collected, we also recorded its attributes by noting the closest landmark or building to tie it accurately to the campus network. We ensured that each point was accurately georeferenced and associated with the correct campus features. An interesting interaction happened when we were collecting data, a student approached us and asked for directions. This highlighted the importance of having accurate and up-to-date spatial data for effective navigation systems.</p>
+
+            <h4>Back to the Lab</h4>
+            <p>Now that the raw spatial data is collected, we are taking it back into QGIS. The next step is to clean up the topology, run our location-allocation models, and integrate everything into the 3D visualization.</p>
+
+            <img src="points_in_qgis.png" alt="Raw field points imported into QGIS" class="zoomable-img">
+        </article>
+
+        <hr>
+        <div class="post-nav">
+            <span></span>
+            <a href="#post-digitising" data-link="post-digitising">Next: Digitising and 3D Model Creation →</a>
+        </div>
+    </main>
+
+    <!-- Post 2 Full Article -->
+    <main id="view-post-digitising" class="post-page" hidden>
+        <a href="#blog" data-link="blog" class="back-link">← Back to Nexus Feed</a>
+        <article>
+            <div class="post-header">
+                <div class="post-meta"><time datetime="2026-09-07">7 September 2026</time><span class="tag">Digitising &amp; 3D</span></div>
+                <h2>Digitising and 3D Model Creation</h2>
+            </div>
+
+            <p>After collecting the field data, the next step was to configure the LiDAR so that it highlighted buildings specifically. This allowed the dataset to serve as a reliable guide during the digitizing process. By focusing on building structures, the LiDAR provided a clear framework for accurate mapping and ensured that the digitized features aligned with real-world conditions.</p>
+
+            <p>Once the LiDAR was set up, the digitizing process began. All buildings within the study area were carefully digitized, along with the pathways that connected them. This step was crucial because it transformed raw spatial data into usable vector features, forming the foundation for subsequent modeling. The inclusion of pathways added an important layer of connectivity, making the dataset more comprehensive.</p>
+
+            <img src="Digitized.png" alt="Digitized buildings and pathways" class="zoomable-img">
+
+            <h4>Bringing the Environment to Life</h4>
+            <p>After digitizing, the workflow progressed to the creation of a 3D model. The digitized buildings were extruded to represent their heights, while pathways were integrated to reflect the spatial layout of the area. This 3D model provided a more realistic visualization of the environment, enabling better analysis of spatial relationships and offering a powerful tool for presentation and interpretation.</p>
+
+            <img src="Model.png" alt="3D model extrusion of campus buildings" class="zoomable-img">
+        </article>
+
+        <hr>
+        <div class="post-nav">
+            <a href="#post-field" data-link="post-field">← Previous: Field Data Collection Process</a>
+            <a href="#post-analysis" data-link="post-analysis">Next: Data and Network Analysis Process →</a>
+        </div>
+    </main>
+
+    <!-- Post 3 Full Article (Merged Detailed 12-Step Spatial Analysis) -->
+    <main id="view-post-analysis" class="post-page" hidden>
+        <a href="#blog" data-link="blog" class="back-link">← Back to Nexus Feed</a>
+        <article>
+            <div class="post-header">
+                <div class="post-meta"><time datetime="2026-10-05">5 October 2026</time><span class="tag">Spatial Analysis</span></div>
+                <h2>Data and Network Analysis Process</h2>
+            </div>
+
+            <p>After completing the 3D campus model, our spatial workflow progressed into location-allocation optimization for placing new navigation map screens across Hatfield Campus. Below is the complete 12-step GIS methodology executed inside QGIS to establish a balanced, highly connected display network.</p>
+
+            <!-- Step 1 & 2 -->
+            <h4>Step 1 &amp; 2: Proximity Buffering</h4>
+            <p>We began by establishing initial zones of influence around key structural nodes[cite: 2, 3]. Step 1 buffers entrance points by 100 meters (<code>ent_buf</code>), while Step 2 buffers building polygons by 20 meters (<code>bld_buf</code>)[cite: 2, 3].</p>
+            <div class="blog-image-grid">
+                <figure>
+                    <img src="ent_buf.png" alt="Step 1: Entrance Buffer (100m)" class="zoomable-img">
+                    <figcaption>Step 1: Entrance Buffer (<code>ent_buf</code>)[cite: 1, 2]</figcaption>
+                </figure>
+                <figure>
+                    <img src="bld_buf.png" alt="Step 2: Building Buffer (20m)" class="zoomable-img">
+                    <figcaption>Step 2: Building Buffer (<code>bld_buf</code>)[cite: 1, 3]</figcaption>
+                </figure>
+            </div>
+
+            <!-- Step 3 & 4 -->
+            <h4>Step 3 &amp; 4: Buffer Intersection &amp; Centroid Generation</h4>
+            <p>Step 3 intersects the entrance and building buffers (<code>inter</code>) to isolate high-traffic candidate zones that sit close to both building access points and main footpaths[cite: 4]. Step 4 extracts the centroid point of each overlapping polygon (<code>cent</code>) to serve as initial candidate locations[cite: 5].</p>
+            <div class="blog-image-grid">
+                <figure>
+                    <img src="inter.png" alt="Step 3: Intersect Buffers" class="zoomable-img">
+                    <figcaption>Step 3: Intersected Overlaps (<code>inter</code>)[cite: 1, 4]</figcaption>
+                </figure>
+                <figure>
+                    <img src="cent.png" alt="Step 4: Centroids of Overlap" class="zoomable-img">
+                    <figcaption>Step 4: Candidate Centroids (<code>cent</code>)[cite: 1, 5]</figcaption>
+                </figure>
+            </div>
+
+            <!-- Step 5 -->
+            <h4>Step 5: Pathway Network Snapping</h4>
+            <p>Candidate points are snapped directly onto pedestrian pathways with a 5-meter tolerance (<code>cent_path</code>) using the <em>Snap geometries to layer</em> tool, ensuring all candidate display nodes rest directly on navigable routes[cite: 6].</p>
+            <img src="cent_path.png" alt="Step 5: Snapped Centroids to Pathway Network" class="zoomable-img">
+
+            <!-- Step 6 & 7 -->
+            <h4>Step 6 &amp; 7: Removing Building Obstructions</h4>
+            <p>To avoid placing displays inside structures, Step 6 selects points intersecting building footprints (<code>selec</code>)[cite: 7]. Step 7 inverts this selection (<code>inv_selec</code>) to filter out unsuitable nodes and retain only points on open ground[cite: 7].</p>
+            <div class="blog-image-grid">
+                <figure>
+                    <img src="selec.png" alt="Step 6: Select Points on Buildings" class="zoomable-img">
+                    <figcaption>Step 6: Unsuitable Building Points (<code>selec</code>)[cite: 1, 7]</figcaption>
+                </figure>
+                <figure>
+                    <img src="inv_selec.png" alt="Step 7: Invert Selection to Open Ground" class="zoomable-img">
+                    <figcaption>Step 7: Open Ground Points (<code>inv_selec</code>)[cite: 1, 7]</figcaption>
+                </figure>
+            </div>
+
+            <!-- Step 8 & 9 -->
+            <h4>Step 8 &amp; 9: Service Coverage Optimization</h4>
+            <p>To prevent redundant screen placement near existing infrastructure, Step 8 selects candidate points within 120 meters of existing LCD displays (<code>selec2</code>)[cite: 8]. Step 9 inverts the selection (<code>inv_selec2</code>) to isolate unserved campus areas requiring new screens[cite: 8].</p>
+            <div class="blog-image-grid">
+                <figure>
+                    <img src="selec2.png" alt="Step 8: Select within 120m of LCD Displays" class="zoomable-img">
+                    <figcaption>Step 8: Nearby Existing LCDs (<code>selec2</code>)[cite: 1, 8]</figcaption>
+                </figure>
+                <figure>
+                    <img src="inv_selec2.png" alt="Step 9: Invert Selection for Suitable Points" class="zoomable-img">
+                    <figcaption>Step 9: Suitable Unserved Points (<code>inv_selec2</code>)[cite: 1, 8]</figcaption>
+                </figure>
+            </div>
+
+            <!-- Step 10 & 11 -->
+            <h4>Step 10 &amp; 11: Spacing Optimization</h4>
+            <p>To avoid local point clustering, Step 10 creates a 25-meter buffer around candidate open-ground points (<code>25m_buffer</code>)[cite: 9]. Step 11 removes overlapping buffer instances (<code>remain</code>), resulting in an evenly distributed point pattern[cite: 10].</p>
+            <div class="blog-image-grid">
+                <figure>
+                    <img src="25m_buffer.png" alt="Step 10: 25m Centroid Buffer" class="zoomable-img">
+                    <figcaption>Step 10: Spacing Buffer (<code>25m_buffer</code>)[cite: 1, 9]</figcaption>
+                </figure>
+                <figure>
+                    <img src="remain.png" alt="Step 11: Remove Intersecting Points" class="zoomable-img">
+                    <figcaption>Step 11: Spaced Suitable Points (<code>remain</code>)[cite: 1, 10]</figcaption>
+                </figure>
+            </div>
+
+            <!-- Step 12 & Final -->
+            <h4>Step 12 &amp; Final Deployment Map</h4>
+            <p>Step 12 merges the optimized new display points with existing legacy LCD screens into a single layer (<code>merg</code>)[cite: 11]. When overlaid against the primary campus base map (<code>campus</code>), it yields the complete network visualization (<code>final</code>)[cite: 1, 11].</p>
+            <div class="blog-image-grid">
+                <figure>
+                    <img src="merg.png" alt="Step 12: Merge Layers" class="zoomable-img">
+                    <figcaption>Step 12: Merged Display Layer (<code>merg</code>)[cite: 1, 11]</figcaption>
+                </figure>
+                <figure>
+                    <img src="final.png" alt="Final Map Overlay" class="zoomable-img">
+                    <figcaption>Final Network Map (<code>final</code>)[cite: 1]</figcaption>
+                </figure>
+            </div>
+        </article>
+
+        <hr>
+        <div class="post-nav">
+            <a href="#post-digitising" data-link="post-digitising">← Previous: Digitising and 3D Model Creation</a>
+            <span></span>
+        </div>
     </main>
 
     <!-- ===================== MAP / 3D MODEL ===================== -->
