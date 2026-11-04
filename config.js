@@ -23,15 +23,8 @@ window.GEONEXUS = {
         ROUTE_COLOR: "#ec4899",
         START_COLOR: "#22c55e",
         DESTINATION_COLOR: "#ef4444"
-        // Optional tuning (defaults shown):
-        // SNAP_TOLERANCE_M: 1.5,   // merge pathway nodes closer than this
-        // MAX_SNAP_M: 75,          // max distance from a screen/entrance to a pathway
-        // MAX_GPS_SNAP_M: 100,     // max distance from a GPS fix to a pathway
-        // GPS_MIN_MOVE_M: 3        // re-route only after moving this far
+       
     }
 
-    // Optional:
-    // TILE_URL: "https://your-tile-provider/{z}/{x}/{y}.png",
-    // TILE_ATTRIBUTION: "...",
-    // ALLOW_EXTERNAL_QR: false
+    
 };
