@@ -463,6 +463,95 @@ window.PathRouter = (function () {
   "use strict";
 
   const $ = (id) => document.getElementById(id);
+  // ==========================================
+// GEONEXUS VOICE NARRATION
+// ==========================================
+
+const navigationAudio = new Audio();
+
+let voiceEnabled = false;
+let journeyStarted = false;
+
+let journeyDistance = 0;
+let travelledDistance = 0;
+let lastProgressCoords = null;
+
+let halfwayPlayed = false;
+let destinationPlayed = false;
+
+
+// Play a recorded voice message
+function playVoice(fileName) {
+
+    navigationAudio.pause();
+    navigationAudio.currentTime = 0;
+
+    navigationAudio.src = "audio/" + fileName;
+
+    navigationAudio.play().catch(error => {
+        console.log("Voice playback error:", error);
+    });
+}
+
+
+// Prepare a new voice journey
+function prepareVoiceJourney() {
+
+    voiceEnabled = true;
+    journeyStarted = false;
+
+    journeyDistance = 0;
+    travelledDistance = 0;
+    lastProgressCoords = null;
+
+    halfwayPlayed = false;
+    destinationPlayed = false;
+}
+
+
+// Check the student's journey progress
+function updateVoiceProgress(coords) {
+
+    if (!voiceEnabled || !journeyStarted) return;
+
+    if (lastProgressCoords) {
+
+        const movement = metersBetween(lastProgressCoords, coords);
+
+        // Ignore very small GPS movements
+        if (movement >= CFG.routing.gpsMinMove) {
+            travelledDistance += movement;
+        }
+    }
+
+    lastProgressCoords = coords;
+
+    // Check whether the student has reached the destination
+    if (activeDestination &&
+        metersBetween(coords, activeDestination) <= 20) {
+
+        if (!destinationPlayed) {
+
+            playVoice("destination_reached.mp3");
+
+            destinationPlayed = true;
+            voiceEnabled = false;
+        }
+
+        return;
+    }
+
+    // Check whether the student is halfway
+    if (travelledDistance >= journeyDistance / 2 &&
+        !halfwayPlayed) {
+
+        playVoice("halfway.mp3");
+
+        halfwayPlayed = true;
+    }
+}
+
+let activeDestination = null;
   const mapContainer = $("map");
   if (!mapContainer) return; // not the 2D page (e.g. the 3D page also loads this file)
   if (typeof L === "undefined") {
@@ -639,6 +728,8 @@ window.PathRouter = (function () {
     userCoords = [lng, lat];
     drawUserMarker(lat, lng, accuracy);
     routeFromGps(false);
+     // Check journey progress and play voice messages
+    updateVoiceProgress(userCoords);
   }
 
   function onGpsError(err) {
@@ -713,6 +804,19 @@ window.PathRouter = (function () {
       setStatus(err.message, true);
       return false;
     }
+    // Start voice narration for a new journey
+if (voiceEnabled && !journeyStarted) {
+
+    journeyDistance = r.distance;
+
+    activeDestination = dest.coordinates;
+
+    journeyStarted = true;
+
+    lastProgressCoords = start.coordinates;
+
+    playVoice("journey_started.mp3");
+}
 
     layers.route.clearLayers();
 
@@ -882,6 +986,7 @@ window.PathRouter = (function () {
           setStatus("Please select a destination entrance.", true);
           return;
         }
+       prepareVoiceJourney();
         pendingDest = d;
         lastRouted = null;
         if (!startLocationTracking({ routing: true })) return;
@@ -898,7 +1003,14 @@ window.PathRouter = (function () {
       gpsRouting = false;
       pendingDest = null;
       releaseLocationTracking();
-      showRoute(s, d, { fit: true });
+      
+      prepareVoiceJourney();
+      if (showRoute(s, d, { fit: true })) {
+
+    // Track the student as they follow the route
+    startLocationTracking({ overlay: true });
+
+}
     });
   }
 
