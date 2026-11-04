@@ -30,7 +30,7 @@
 
         <section class="content-left">
 
-            <!-- HOME -->
+            <!-- HOME VIEW -->
             <div data-view="home">
                 <h2>GeoNexus</h2>
                 <p>Welcome to GEONEXUS, where boundaries disappear and possibilities connect. We don't just build 3D models — we engineer digital realities.</p>
@@ -101,7 +101,7 @@
                 </article>
             </div>
 
-            <!-- ABOUT -->
+            <!-- ABOUT VIEW -->
             <div data-view="about" hidden>
                 <h2>Project Origins</h2>
                 <p>GEONEXUS was established in 2026 to bridge the gap between physical topography and digital consciousness. Our mission is to seamlessly map the physical world into an immersive, interactive reality framework.</p>
@@ -190,7 +190,7 @@
         </section>
     </main>
 
-    <!-- ===================== BLOG FEED ===================== -->
+    <!-- ===================== BLOG FEED VIEW ===================== -->
     <main id="view-blog" hidden>
         <section class="content-full">
             <h2>Nexus Feed</h2>
@@ -307,7 +307,7 @@
         </div>
     </main>
 
-    <!-- Post 3 Full Article (Merged Detailed 12-Step Spatial Analysis) -->
+    <!-- Post 3 Full Article (Detailed 12-Step Spatial Analysis) -->
     <main id="view-post-analysis" class="post-page" hidden>
         <a href="#blog" data-link="blog" class="back-link">← Back to Nexus Feed</a>
         <article>
@@ -415,7 +415,7 @@
         </div>
     </main>
 
-    <!-- ===================== MAP / 3D MODEL ===================== -->
+    <!-- ===================== MAP / 3D MODEL VIEW ===================== -->
     <main id="view-map" hidden>
         <section>
             <h2>Campus 3D Model</h2>
@@ -463,11 +463,98 @@
         <div id="modalCaption"></div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Cesium.js"></script>
     <script src="script.js"></script>
     <script type="module" src="globe.js"></script>
     <script type="module" src="app.js"></script>
     <script src="config.js"></script>
     <script src="routing.js"></script>
+
+    <!-- Unified Single-Page Router & Lightbox Handler Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mains = document.querySelectorAll('main');
+            const subViews = document.querySelectorAll('[data-view]');
+            const navLinks = document.querySelectorAll('nav a');
+
+            function handleRouting() {
+                const rawHash = window.location.hash.replace('#', '') || 'home';
+                let targetMainId = 'view-hero';
+                let activeSubView = 'home';
+
+                if (rawHash === 'home' || rawHash === 'about') {
+                    targetMainId = 'view-hero';
+                    activeSubView = rawHash;
+                } else if (rawHash === 'blog') {
+                    targetMainId = 'view-blog';
+                } else if (rawHash === 'map') {
+                    targetMainId = 'view-map';
+                } else if (rawHash.startsWith('post-')) {
+                    targetMainId = `view-${rawHash}`;
+                }
+
+                // Hide all main view containers
+                mains.forEach(main => main.hidden = true);
+
+                // Show target main container
+                const activeMain = document.getElementById(targetMainId);
+                if (activeMain) {
+                    activeMain.hidden = false;
+                }
+
+                // If in hero view, switch between Home and About subviews
+                if (targetMainId === 'view-hero') {
+                    subViews.forEach(v => {
+                        v.hidden = (v.getAttribute('data-view') !== activeSubView);
+                    });
+                }
+
+                // Highlight active navigation links
+                navLinks.forEach(link => {
+                    const linkTarget = link.getAttribute('data-link');
+                    if (linkTarget === activeSubView || linkTarget === rawHash || (rawHash.startsWith('post-') && linkTarget === 'blog')) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            window.addEventListener('hashchange', handleRouting);
+            handleRouting();
+
+            // Modal Lightbox Zoom Script
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImg');
+            const modalClose = document.querySelector('.modal-close');
+
+            document.querySelectorAll('.zoomable-img, article img').forEach(img => {
+                img.addEventListener('click', () => {
+                    if (modal && modalImg) {
+                        modal.classList.add('open');
+                        modalImg.src = img.src;
+                        modalImg.alt = img.alt || 'Enlarged Image';
+                    }
+                });
+            });
+
+            if (modalClose) {
+                modalClose.addEventListener('click', () => modal.classList.remove('open'));
+            }
+
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) modal.classList.remove('open');
+                });
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal) modal.classList.remove('open');
+            });
+        });
+    </script>
 </body>
 </html>
