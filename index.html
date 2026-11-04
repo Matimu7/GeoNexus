@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEONEXUS</title>
+    <link rel="icon" type="image/png" href="G-logo.png">
+    <link rel="stylesheet" href="Styles.css">
+    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Widgets/widgets.css">
+</head>
+<body>
+
+    <header>
+        <a href="#home" class="brand" data-link="home">
+            <img src="G-logo.png" alt="GeoNexus logo" class="brand-logo">
+            <h1>GEONEXUS</h1>
+        </a>
+        <p>VISION INTO IMMERSIVE REALITY</p>
+    </header>
+
+    <nav>
+        <a href="#home" data-link="home">Home</a>
+        <a href="#about" data-link="about">About</a>
+        <a href="#blog" data-link="blog">Blog</a>
+        <a href="#map" data-link="map">3D Model</a>
+    </nav>
+
+    <!-- ===================== HOME + ABOUT (share the globe) ===================== -->
+    <main class="hero-split" id="view-hero">
+
+        <section class="content-left">
+
+            <!-- HOME -->
+            <div data-view="home">
+                <h2>GeoNexus</h2>
+                <p>Welcome to GEONEXUS, where boundaries disappear and possibilities connect. We don't just build 3D models — we engineer digital realities.</p>
+
+                <div class="btn-row">
+                    <a href="Model_3D.html" target="_blank" rel="noopener" class="cta">Open Navigation Model</a>
+                    <a href="#blog" data-link="blog" class="cta secondary">Read the blog</a>
+                </div>
+
+                <hr>
+
+                <h2>How it works</h2>
+                <ol class="steps">
+                    <li>
+                        <h3>Collect</h3>
+                        <p>We capture navigational assets on the ground at Hatfield Campus using QField.</p>
+                    </li>
+                    <li>
+                        <h3>Digitise</h3>
+                        <p>LiDAR guides us as we digitise every building and the pathways between them.</p>
+                    </li>
+                    <li>
+                        <h3>Model</h3>
+                        <p>Buildings are extruded to their real heights to form an interactive 3D campus.</p>
+                    </li>
+                    <li>
+                        <h3>Analyse</h3>
+                        <p>Buffers, centroids and distance matrices turn the data into a connected network.</p>
+                    </li>
+                </ol>
+
+                <hr>
+
+                <h2>Projects</h2>
+                <div class="module-grid">
+                    <article class="module-card">
+                        <h3>Smart Campus Navigation Dashboard</h3>
+                        <p>Explore our prototype navigation system in action:</p>
+
+                        <div class="video-container" style="margin-top: 1rem;">
+                            <video width="100%" controls poster="" preload="metadata">
+                                <source src="Nav_prev.mp4" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </article>
+                </div>
+
+                <hr>
+
+                <h2>What we mapped</h2>
+                <p>Every point was logged with its closest building, so it ties into the campus network.</p>
+                <ul class="chip-row">
+                    <li>Turnstile entrances</li>
+                    <li>Static maps</li>
+                    <li>Sign boards</li>
+                    <li>Old LCD displays</li>
+                </ul>
+
+                <hr>
+
+                <h2>From the Nexus Feed</h2>
+                <article class="module-card teaser">
+                    <h3>Data and Network Analysis Process</h3>
+                    <p>How we used buffers, centroids and a distance matrix to build an evenly spread, connected campus network.</p>
+                    <img src="buffer2.png" alt="Intersecting buffer overlay">
+                    <p><a href="#blog" data-link="blog" class="text-link">Read the full post</a></p>
+                </article>
+            </div>
+
+            <!-- ABOUT -->
+            <div data-view="about" hidden>
+                <h2>Project Origins</h2>
+                <p>GEONEXUS was established in 2026 to bridge the gap between physical topography and digital consciousness. Our mission is to seamlessly map the physical world into an immersive, interactive reality framework.</p>
+
+                <hr>
+
+                <h2>Vision &amp; Mission</h2>
+                <div class="module-grid">
+                    <article class="module-card">
+                        <h3>Our Vision <span class="dot online"></span></h3>
+                        <p>To pioneer the future of spatial intelligence by transforming complex physical environments into highly accurate, immersive, and interactive 3D digital realities.</p>
+                    </article>
+
+                    <article class="module-card">
+                        <h3>Our Mission <span class="dot online"></span></h3>
+                        <p>To bridge physical topography and digital ecosystems through automated spatial data pipelines, advanced web mapping architectures, and seamless 3D spatial modeling.</p>
+                    </article>
+                </div>
+
+                <hr>
+
+                <h2>Our Values</h2>
+                <div class="module-grid">
+                    <article class="module-card">
+                        <h3>Ground-truth accuracy</h3>
+                        <p>Every model starts with data collected on the ground and checked against the real world.</p>
+                    </article>
+
+                    <article class="module-card">
+                        <h3>Connection</h3>
+                        <p>We link physical places and digital systems so people can move through both with ease.</p>
+                    </article>
+
+                    <article class="module-card">
+                        <h3>Clarity</h3>
+                        <p>Complex spatial data should be simple to see, explore and understand.</p>
+                    </article>
+
+                    <article class="module-card">
+                        <h3>Innovation</h3>
+                        <p>We automate our data pipelines and keep testing new ways to present space.</p>
+                    </article>
+                </div>
+
+                <hr>
+
+                <h2>Meet the Team</h2>
+                <div class="team-grid">
+                    <article class="team-card">
+                        <h3>Matimu Mbambo</h3>
+                        <div class="team-image"><img src="cv_pic.jpeg" alt="Matimu Mbambo"></div>
+                        <p>Geoinformatics &amp; System Design</p>
+                    </article>
+
+                    <article class="team-card">
+                        <h3>Ofentse Lekhuleni</h3>
+                        <div class="team-image"><img src="OL.png" alt="Ofentse Lekhuleni"></div>
+                        <p>Spatial Modelling</p>
+                    </article>
+
+                    <article class="team-card">
+                        <h3>Tanatswa Makombe</h3>
+                        <div class="team-image"><img src="TM.jpeg" alt="Tanatswa Makombe"></div>
+                        <p>Web Architecture</p>
+                    </article>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Single shared globe -->
+        <section class="visual-right">
+            <div class="globe-container">
+                <canvas id="globeCanvas"></canvas>
+
+                <div class="globe-overlay">
+                    <span>Vision into Reality</span>
+                    <span>3D Modelling</span>
+                </div>
+
+                <div class="globe-status">
+                    <span class="status-dot"></span>
+                    GEONEXUS DATA LINK
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================== BLOG ===================== -->
+    <main id="view-blog" hidden>
+        <section class="content-full">
+            <h2>Nexus Feed</h2>
+            <hr>
+
+            <div class="blog-feed">
+                <article>
+                    <h3>Field Data Collection Process <span class="dot online"></span></h3>
+                    <p>You cannot build a good spatial model without solid ground-truth data. This week, we stepped away from the lab to map the pathways and nodes that will run our Smart Campus navigation dashboard system.</p>
+
+                    <h4>Prepping the Tools</h4>
+                    <p>Before heading outside, we set up our data collection forms in QField. Getting our database schemas sorted beforehand meant that once we were on campus, logging the points and attributes was quick and standardized.</p>
+
+                    <h4>On the Ground at Hatfield Campus</h4>
+
+                    <!-- Side-by-side images for static maps -->
+                    <div class="image-row">
+                        <img src="static.jpeg" alt="In front of the Static Map" class="zoomable-img">
+                        <img src="static2.jpeg" alt="Second view of Static Map" class="zoomable-img">
+                    </div>
+
+                    <p>We headed out across the Hatfield campus to track down our key navigational assets. We used our mobile setups to capture the exact point coordinates of the existing infrastructure. It is one thing to look at an aerial orthophoto, but being on the ground is the only way to accurately log the specific locations of turnstile entrances, static maps, sign boards, and old LCD displays, and make sure they are properly tied to the closest buildings.</p>
+
+                    <div class="image-row">
+                        <img src="data_capture.jpeg" alt="Using QField to collect data" class="zoomable-img">
+                        <img src="qfield.jpg" alt="QField interface during data collection" class="zoomable-img">
+                    </div>
+
+                    <h4>What We Mapped</h4>
+                    <p>Using QField, we focused specifically on capturing existing navigational assets around campus. We logged:</p>
+                    <ul>
+                        <li>Turnstile entrances</li>
+                        <li>Static maps</li>
+                        <li>Sign boards</li>
+                        <li>Old LCD displays</li>
+                    </ul>
+                    <p>For every point we collected, we also recorded its attributes by noting the closest landmark or building to tie it accurately to the campus network.</p>
+
+                    <h4>Back to the Lab</h4>
+                    <p>Now that the raw spatial data is collected, we are taking it back into QGIS. The next step is to clean up the topology, run our location-allocation models, and integrate everything into the 3D visualization.</p>
+
+                    <img src="points_in_qgis.png" alt="Raw field points imported into QGIS" class="zoomable-img">
+                </article>
+
+                <article>
+                    <h3>Digitising and 3D Model Creation <span class="dot online"></span></h3>
+                    <p>After collecting the field data, the next step was to configure the LiDAR so that it highlighted buildings specifically. This allowed the dataset to serve as a reliable guide during the digitizing process. By focusing on building structures, the LiDAR provided a clear framework for accurate mapping and ensured that the digitized features aligned with real-world conditions.</p>
+
+                    <p>Once the LiDAR was set up, the digitizing process began. All buildings within the study area were carefully digitized, along with the pathways that connected them. This step was crucial because it transformed raw spatial data into usable vector features, forming the foundation for subsequent modeling. The inclusion of pathways added an important layer of connectivity, making the dataset more comprehensive.</p>
+
+                    <img src="Digitized.png" alt="Digitized buildings and pathways" class="zoomable-img">
+
+                    <h4>Bringing the Environment to Life</h4>
+                    <p>After digitizing, the workflow progressed to the creation of a 3D model. The digitized buildings were extruded to represent their heights, while pathways were integrated to reflect the spatial layout of the area. This 3D model provided a more realistic visualization of the environment, enabling better analysis of spatial relationships and offering a powerful tool for presentation and interpretation.</p>
+
+                    <img src="Model.png" alt="3D model extrusion of campus buildings" class="zoomable-img">
+                </article>
+
+                <article>
+                    <h3>Data and Network Analysis Process <span class="dot online"></span></h3>
+                    <p>After completing the 3D model, the workflow advanced into spatial analysis using map screens. The first step was to generate buffers around the buildings and their entrances. These buffers created zones of influence, which helped in identifying areas of potential interaction between structures and access points. By intersecting the buffers, polygons were formed that represented overlapping areas of influence.</p>
+
+                    <!-- Buffer & Final Point Images Row -->
+                    <div class="blog-image-grid">
+                        <figure>
+                            <img src="buffer1.png" alt="Building and Entrance Buffers" class="zoomable-img">
+                            <figcaption>Building Buffers</figcaption>
+                        </figure>
+                        <figure>
+                            <img src="buffer2.png" alt="Intersecting Buffer Overlay" class="zoomable-img">
+                            <figcaption>Buffer Intersections</figcaption>
+                        </figure>
+                        <figure>
+                            <img src="finalpoint.png" alt="Final Snapped Network Points" class="zoomable-img">
+                            <figcaption>Final Snapped Points</figcaption>
+                        </figure>
+                    </div>
+
+                    <h4>Refining Spatial Connectivity</h4>
+                    <p>From these intersection polygons, the centroids function was applied to calculate central points. These centroids acted as representative locations within each overlap zone. To integrate them into the network, the centroids were snapped to the pathway layer, ensuring that they aligned with existing circulation routes. This step was important for maintaining spatial connectivity and realism in the analysis.</p>
+
+                    <p>However, snapping centroids to pathways sometimes resulted in clusters of points in certain areas. To address this, the distance matrix function was used. This function calculates the Euclidean distance between points, allowing for the identification and reduction of clustering. By applying it, the dataset was refined to ensure that points were more evenly distributed, improving the accuracy and usability of the analysis.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================== MAP / 3D MODEL ===================== -->
+    <main id="view-map" hidden>
+        <section>
+            <h2>Campus 3D Model Matrix</h2>
+
+            <div class="map-container tall">
+                <div id="cesiumContainer"></div>
+
+                <div id="panel">
+                    <h3>LAYER MATRIX</h3>
+                    <label><input type="checkbox" id="tglBuildings" checked> Buildings</label>
+                    <label><input type="checkbox" id="tglPaths" checked> Pathways</label>
+                    <label><input type="checkbox" id="tglAoi" checked> Campus Boundary</label>
+                    <button id="btnHome">Zoom to Campus</button>
+                    <div id="info">Click a building for telemetry attributes.</div>
+                </div>
+            </div>
+
+            <div class="module-grid spaced">
+                <article class="module-card">
+                    <h3>3D Experience<span class="dot online"></span></h3>
+                    <p>Explore the campus in a fully immersive 3D environment.</p>
+                </article>
+
+                <article class="module-card">
+                    <h3>Visualisation<span class="dot online"></span></h3>
+                    <p>Visualise the campus data in a dynamic and interactive manner.</p>
+                </article>
+
+                <article class="module-card">
+                    <h3>Web Platform <span class="dot standby"></span></h3>
+                    <p>Access the campus data through our web-based platform.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 GEONEXUS Systems. All rights reserved.</p>
+    </footer>
+
+    <!-- Lightbox Modal Container for Image Maximizing -->
+    <div id="imageModal" class="image-modal">
+        <span class="modal-close">&times;</span>
+        <img class="modal-content" id="modalImg" alt="Enlarged view">
+        <div id="modalCaption"></div>
+    </div>
+
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Cesium.js"></script>
+    <script src="script.js"></script>
+    <script type="module" src="globe.js"></script>
+    <script type="module" src="app.js"></script>
+
+</body>
+</html>
