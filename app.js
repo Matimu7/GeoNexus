@@ -326,7 +326,17 @@ on("btnHome", "click", home);
 on("tglBuildings", "change", (e) => { buildings.show = e.target.checked; });
 on("tglPaths", "change", (e) => { paths.show = e.target.checked; });
 on("tglAoi", "change", (e) => { aoi.show = e.target.checked; });
-if ($("tglDashboards")) on("tglDashboards", "change", (e) => { dashboards.show = e.target.checked; });
+
+// Bind the dashboard screens toggle
+if ($("tglDashboard")) {
+  on("tglDashboard", "change", (e) => { dashboards.show = e.target.checked; });
+}
+
+// (Optional fallback if your HTML uses tglDashboards in plural)
+if ($("tglDashboards")) {
+  on("tglDashboards", "change", (e) => { dashboards.show = e.target.checked; });
+}
+
 if ($("tglEntrances")) {
   $("tglEntrances").checked = ENTRANCES_VISIBLE_BY_DEFAULT;
   on("tglEntrances", "change", (e) => {
