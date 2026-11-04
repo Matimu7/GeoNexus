@@ -3,7 +3,7 @@
 // ==========================================
 
 window.GEONEXUS = {
-    PUBLIC_BASE_URL: "https://Matimu7.github.io/GeoNexus---Website/",
+    PUBLIC_BASE_URL: "https://matimu7.github.io/GeoNexus---Website/",
     ROUTE_PAGE: "route.html",
 
     // Your NEW Cesium Ion token. Rotate the old one and restrict the new one
