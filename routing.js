@@ -468,6 +468,10 @@ window.PathRouter = (function () {
   // GEONEXUS VOICE NARRATION
   // ==========================================
 
+  // Audio files live in the same folder as route.html.
+  // If you ever move them into a subfolder, set this to e.g. "audio/".
+  const AUDIO_BASE = "";
+
   const navigationAudio = new Audio();
 
   let voiceEnabled = false;
@@ -495,12 +499,12 @@ window.PathRouter = (function () {
   function playVoice(fileName) {
     navigationAudio.pause();
     navigationAudio.currentTime = 0;
-    navigationAudio.src = "audio/" + fileName;
+    navigationAudio.src = AUDIO_BASE + fileName;
 
     const playPromise = navigationAudio.play();
     if (playPromise !== undefined) {
       playPromise.catch((error) => {
-        console.warn(`[GEONEXUS Voice] Playback error for audio/${fileName}:`, error);
+        console.warn(`[GEONEXUS Voice] Playback error for ${AUDIO_BASE + fileName}:`, error);
       });
     }
   }
