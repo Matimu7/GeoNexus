@@ -472,27 +472,38 @@ window.PathRouter = (function () {
   // If you ever move them into a subfolder, set this to e.g. "audio/".
   const AUDIO_BASE = "";
 
+  // Voice tuning
+  const ARRIVAL_RADIUS_M = 20;      // "destination reached" when this close to the destination
+  const MAX_VOICE_ACCURACY_M = 50;  // ignore GPS fixes less accurate than this for voice progress
+  const MIN_HALFWAY_ROUTE_M = 30;   // routes shorter than this never play the halfway message
+
+  // A tiny silent WAV, used to unlock audio playback inside a tap/click.
+  const SILENT_WAV =
+    "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=";
+
   const navigationAudio = new Audio();
 
-  let voiceEnabled = false;
-  let journeyStarted = false;
-
-  let journeyDistance = 0;
-  let travelledDistance = 0;
-  let lastProgressCoords = null;
-
+  let voiceEnabled = false;   // user has enabled voice for this journey (needs a tap)
+  let journeyStarted = false; // "journey started" message has been played
+  let baselineRemaining = null; // route distance left at the user's first real GPS fix
   let halfwayPlayed = false;
   let destinationPlayed = false;
   let activeDestination = null;
+  let currentRoute = null;    // { start, dest, distance } of the route currently on screen
+  let voiceBannerEl = null;
 
-  // Unlocks audio context on mobile/desktop browsers directly inside a click event
+  // Unlocks audio on mobile/desktop browsers. Must be called inside a click/tap handler.
   function unlockAudio() {
-    navigationAudio.play().then(() => {
-      navigationAudio.pause();
-      navigationAudio.currentTime = 0;
-    }).catch(() => {
-      // Swallowed: Expected during silent warmup attempt
-    });
+    navigationAudio.src = SILENT_WAV;
+    const p = navigationAudio.play();
+    if (p !== undefined) {
+      p.then(() => {
+        navigationAudio.pause();
+        navigationAudio.currentTime = 0;
+      }).catch(() => {
+        // Expected if the browser refuses the silent warm-up
+      });
+    }
   }
 
   // Play a recorded voice message
@@ -509,37 +520,48 @@ window.PathRouter = (function () {
     }
   }
 
-  // Prepare a new voice journey
+  // Prepare a new voice journey (call from a user tap/click)
   function prepareVoiceJourney() {
     unlockAudio();
     voiceEnabled = true;
     journeyStarted = false;
 
-    journeyDistance = 0;
-    travelledDistance = 0;
-    lastProgressCoords = null;
-
+    baselineRemaining = null;
     halfwayPlayed = false;
     destinationPlayed = false;
+    activeDestination = null;
   }
 
-  // Check the student's journey progress
-  function updateVoiceProgress(coords) {
-    if (!voiceEnabled || !journeyStarted) return;
-
-    if (lastProgressCoords) {
-      const movement = metersBetween(lastProgressCoords, coords);
-
-      // Ignore very small GPS movements
-      if (movement >= CFG.routing.gpsMinMove) {
-        travelledDistance += movement;
-      }
+  // Route distance (m) from a position to the active destination, or null if unavailable
+  function remainingDistance(coords) {
+    if (!network || !activeDestination) return null;
+    try {
+      return network.route(coords, activeDestination, {
+        maxStartSnap: CFG.routing.maxGpsSnapDistance,
+        startLabel: "Your location"
+      }).distance;
+    } catch (e) {
+      return null;
     }
+  }
 
-    lastProgressCoords = coords;
+  // Start narration for the route currently on screen
+  function beginJourney(dest) {
+    activeDestination = dest.coordinates;
+    journeyStarted = true;
+    baselineRemaining = null;
+    if (userCoords) baselineRemaining = remainingDistance(userCoords);
+    playVoice("journey_started.mp3");
+  }
 
-    // Check whether the student has reached the destination
-    if (activeDestination && metersBetween(coords, activeDestination) <= 20) {
+  // Called on every GPS fix. Progress is measured by how much route is LEFT,
+  // so GPS jitter or a standing-still user can never trigger "halfway".
+  function updateVoiceProgress(coords, accuracy) {
+    if (!voiceEnabled || !journeyStarted || !activeDestination) return;
+    if (accuracy && accuracy > MAX_VOICE_ACCURACY_M) return;
+
+    // Arrived?
+    if (metersBetween(coords, activeDestination) <= ARRIVAL_RADIUS_M) {
       if (!destinationPlayed) {
         playVoice("destination_reached.mp3");
         destinationPlayed = true;
@@ -548,10 +570,50 @@ window.PathRouter = (function () {
       return;
     }
 
-    // Check whether the student is halfway
-    if (travelledDistance >= journeyDistance / 2 && !halfwayPlayed) {
+    const remaining = remainingDistance(coords);
+    if (remaining === null) return;
+
+    // The first real GPS fix sets the baseline (where the person actually starts from)
+    if (baselineRemaining === null || remaining > baselineRemaining) {
+      baselineRemaining = remaining;
+      return;
+    }
+
+    if (
+      !halfwayPlayed &&
+      baselineRemaining >= MIN_HALFWAY_ROUTE_M &&
+      remaining <= baselineRemaining / 2
+    ) {
       playVoice("halfway.mp3");
       halfwayPlayed = true;
+    }
+  }
+
+  // Shown on QR / shared-link visits: browsers only allow sound after a tap.
+  function showVoiceBanner() {
+    if (voiceBannerEl || voiceEnabled) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "🔊 Tap to start voice guidance";
+    btn.style.cssText =
+      "position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:10000;" +
+      "padding:12px 20px;border:0;border-radius:999px;background:#2563eb;color:#fff;" +
+      "font:600 15px system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;";
+    btn.addEventListener("click", () => {
+      prepareVoiceJourney();
+      hideVoiceBanner();
+      // If the route is already on screen, begin now; otherwise showRoute() begins it
+      // as soon as the first GPS-based route is calculated.
+      if (currentRoute) beginJourney(currentRoute.dest);
+    });
+    document.body.appendChild(btn);
+    voiceBannerEl = btn;
+  }
+
+  function hideVoiceBanner() {
+    if (voiceBannerEl) {
+      voiceBannerEl.remove();
+      voiceBannerEl = null;
     }
   }
 
@@ -732,7 +794,7 @@ window.PathRouter = (function () {
     drawUserMarker(lat, lng, accuracy);
     routeFromGps(false);
     // Check journey progress and play voice messages
-    updateVoiceProgress(userCoords);
+    updateVoiceProgress(userCoords, accuracy);
   }
 
   function onGpsError(err) {
@@ -808,14 +870,12 @@ window.PathRouter = (function () {
       return false;
     }
 
+    // Remember the route on screen (used when voice is enabled after the route is shown)
+    currentRoute = { start, dest, distance: r.distance };
+
     // Start voice narration for a new journey
     if (voiceEnabled && !journeyStarted) {
-      journeyDistance = r.distance;
-      activeDestination = dest.coordinates;
-      journeyStarted = true;
-      lastProgressCoords = start.coordinates;
-
-      playVoice("journey_started.mp3");
+      beginJourney(dest);
     }
 
     layers.route.clearLayers();
@@ -949,6 +1009,9 @@ window.PathRouter = (function () {
         return;
       }
 
+      // Browsers block sound until the visitor taps something, so offer a button.
+      showVoiceBanner();
+
       if (sParam === GPS_URL_TOKEN || sParam === GPS_START_ID) {
         if (startSelect) startSelect.value = GPS_START_ID;
         if (endSelect) endSelect.value = d.id;
@@ -983,6 +1046,7 @@ window.PathRouter = (function () {
 
       // Prepare voice journey inside direct user click event
       prepareVoiceJourney();
+      hideVoiceBanner();
 
       if (startSelect.value === GPS_START_ID) {
         if (!d) {
@@ -1016,11 +1080,19 @@ window.PathRouter = (function () {
   const endRouteBtn = $("btnEnd");
   if (endRouteBtn) {
     endRouteBtn.addEventListener("click", () => {
-      // Stop audio immediately when ending route
-      navigationAudio.pause();
-      navigationAudio.currentTime = 0;
+      // Ending a journey in progress plays the "destination reached" message
+      // (unless it already played automatically on arrival).
+      if (journeyStarted && !destinationPlayed) {
+        playVoice("destination_reached.mp3");
+        destinationPlayed = true;
+      }
+      // Don't pause the audio here, so the message can finish playing.
       voiceEnabled = false;
       journeyStarted = false;
+      activeDestination = null;
+      baselineRemaining = null;
+      currentRoute = null;
+      hideVoiceBanner();
 
       gpsRouting = false;
       pendingDest = null;
