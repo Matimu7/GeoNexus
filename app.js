@@ -332,10 +332,7 @@ if ($("tglDashboard")) {
   on("tglDashboard", "change", (e) => { dashboards.show = e.target.checked; });
 }
 
-// (Optional fallback if your HTML uses tglDashboards in plural)
-if ($("tglDashboards")) {
-  on("tglDashboards", "change", (e) => { dashboards.show = e.target.checked; });
-}
+
 
 if ($("tglEntrances")) {
   $("tglEntrances").checked = ENTRANCES_VISIBLE_BY_DEFAULT;
