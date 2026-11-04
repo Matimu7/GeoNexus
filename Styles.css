@@ -485,11 +485,15 @@ hr {
     text-shadow: 0 0 8px rgba(72, 229, 194, 0.7);
 }
 
+/* Teaser images: consistent, taller crop so faces/signs stay in view */
 .teaser img {
     display: block;
     width: 100%;
-    max-height: 180px;
+    height: auto;
+    max-height: none;
+    aspect-ratio: 16 / 10;
     object-fit: cover;
+    object-position: center 30%;
     margin-top: 14px;
     border-radius: 16px;
 }
